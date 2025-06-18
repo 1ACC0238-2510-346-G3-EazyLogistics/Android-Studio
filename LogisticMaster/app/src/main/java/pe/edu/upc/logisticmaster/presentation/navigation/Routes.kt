@@ -4,8 +4,9 @@ object Routes {
 
     val Login = Screen("login")
     val Register = Screen("register")
-    val Reserve = Screen("reserve")
 
+    val Menu = Screen("menu")
+    val PersonalManagement = Screen("personal_management")
 
 
 

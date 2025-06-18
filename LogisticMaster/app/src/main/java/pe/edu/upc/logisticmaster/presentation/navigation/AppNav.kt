@@ -8,6 +8,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import pe.edu.upc.logisticmaster.presentation.view.LoginScreen
+import pe.edu.upc.logisticmaster.presentation.view.MainMenuScreen
+import pe.edu.upc.logisticmaster.presentation.view.PersonalManagementScreen
 import pe.edu.upc.logisticmaster.presentation.viewmodel.AppViewModel
 import pe.edu.upc.logisticmaster.presentation.viewmodel.UserViewModel
 
@@ -24,6 +26,12 @@ fun AppNav(navController: NavHostController,    userViewModel: UserViewModel, ap
             }
         composable(Routes.Register.route) {
             RegisterScreen(navController = navController, appViewModel = appViewModel)
+        }
+        composable(Routes.Menu.route) {
+            MainMenuScreen(navController = navController, appViewModel = appViewModel)
+        }
+        composable(Routes.PersonalManagement.route) {
+            PersonalManagementScreen(navController = navController, appViewModel = appViewModel)
         }
     }
 
