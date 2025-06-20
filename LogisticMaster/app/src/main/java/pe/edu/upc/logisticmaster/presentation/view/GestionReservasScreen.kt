@@ -50,9 +50,9 @@ fun GestionReservasScreen(navController: NavController) {
 
     val reservas = remember {
         mutableStateListOf(
-            Reserva("Diego Bertie", "001", "10", "3", "Libre"),
-            Reserva("Tony Stark", "002", "104", "5", "Ocupado"),
-            Reserva("Alex Broca", "003", "106", "7", "Libre")
+            Reserva("Diego Bertie", "001", "101", "10.55", "Libre"),
+            Reserva("Tony Stark", "002", "102", "09:30", "Ocupada"),
+            Reserva("Alex Broca", "003", "103", "19:45", "Libre")
         )
     }
 
@@ -205,10 +205,10 @@ fun GestionReservasScreen(navController: NavController) {
                                     .padding(vertical = 8.dp),
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    Text("Nombre: ${reserva.nombre}", color = Color.White)
-                                    Text("N° de Empleado: ${reserva.numero}", color = Color.White)
-                                    Text("N° de Turnos en la semana: ${reserva.fecha}", color = Color.White)
-                                    Text("Estado de Empleado: ${reserva.estado}", color = Color.White)
+                                    Text("Nombre del huesped: ${reserva.nombre}", color = Color.White)
+                                    Text("N° de Habitacion: ${reserva.numero}", color = Color.White)
+                                    Text("Hora de ingreso: ${reserva.fecha}", color = Color.White)
+                                    Text("Estado de Habitacion: ${reserva.estado}", color = Color.White)
                                 }
                             }
                         }

@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import pe.edu.upc.logisticmaster.R
 
@@ -166,6 +167,16 @@ fun DetalleReservaScreen(navController: NavController) {
         ) {
             Text("VOLVER A LA PANTALLA PRINCIPAL", color = textColor)
         }
+        Spacer(modifier = Modifier.height(24.dp))
+        // Imagen (logo)
+        Image(
+            painter = painterResource(id = R.drawable.logistics_logo),
+            contentDescription = "Logo",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp),
+            contentScale = ContentScale.Fit
+        )
     }
 }
 

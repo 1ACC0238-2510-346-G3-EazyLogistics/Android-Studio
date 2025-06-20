@@ -1,5 +1,6 @@
 package pe.edu.upc.logisticmaster.presentation.view
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -15,10 +16,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import pe.edu.upc.logisticmaster.R
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
 
 @Composable
@@ -104,6 +108,16 @@ fun FiltersScreen(navController: NavController) {
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(24.dp))
+            // Imagen (logo)
+            Image(
+                painter = painterResource(id = R.drawable.logistics_logo),
+                contentDescription = "Logo",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                contentScale = ContentScale.Fit
+            )
         }
     }
 }
