@@ -7,9 +7,13 @@ import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import pe.edu.upc.logisticmaster.presentation.view.DetalleReservaScreen
+import pe.edu.upc.logisticmaster.presentation.view.FiltersScreen
+import pe.edu.upc.logisticmaster.presentation.view.GestionReservasScreen
 import pe.edu.upc.logisticmaster.presentation.view.LoginScreen
 import pe.edu.upc.logisticmaster.presentation.view.MainMenuScreen
 import pe.edu.upc.logisticmaster.presentation.view.PersonalManagementScreen
+import pe.edu.upc.logisticmaster.presentation.view.ReportScreen
 import pe.edu.upc.logisticmaster.presentation.viewmodel.AppViewModel
 import pe.edu.upc.logisticmaster.presentation.viewmodel.UserViewModel
 
@@ -33,6 +37,17 @@ fun AppNav(navController: NavHostController,    userViewModel: UserViewModel, ap
         composable(Routes.PersonalManagement.route) {
             PersonalManagementScreen(navController = navController, appViewModel = appViewModel)
         }
+        composable(Routes.Filters.route) {
+            FiltersScreen(navController = navController)
+        }
+        composable(Routes.Reports.route) {
+            ReportScreen()
+        }
+        composable(Routes.ReservationDetail.route) {
+            DetalleReservaScreen()
+        }
+        composable(Routes.ReservationManagement.route) {
+            GestionReservasScreen(navController = navController)
+        }
     }
-
 }

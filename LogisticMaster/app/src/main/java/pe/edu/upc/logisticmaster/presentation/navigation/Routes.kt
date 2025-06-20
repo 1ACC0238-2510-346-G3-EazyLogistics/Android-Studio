@@ -8,7 +8,10 @@ object Routes {
     val Menu = Screen("menu")
     val PersonalManagement = Screen("personal_management")
 
-
+    val Filters = Screen("filters")
+    val Reports = Screen("reports")
+    val ReservationDetail = Screen("reservation_detail")
+    val ReservationManagement = Screen("reservation_management")
 
     data class Screen(val route: String)
 }

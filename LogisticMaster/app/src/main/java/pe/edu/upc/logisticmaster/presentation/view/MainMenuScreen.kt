@@ -84,9 +84,10 @@ fun MainMenuScreen(navController: NavController, appViewModel: AppViewModel) {
             }
 
             MenuButton("Administración de reservas") {
-                // navController.navigate("administracionReservas")
+                navController.navigate(Routes.ReservationManagement.route) {
+                    popUpTo(Routes.Menu.route)
+                }
             }
-
             MenuButton("Volver") {
                 navController.navigate(Routes.Login.route) {
                     popUpTo(Routes.Menu.route) { inclusive = true }
