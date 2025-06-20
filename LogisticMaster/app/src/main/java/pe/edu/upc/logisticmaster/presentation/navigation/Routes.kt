@@ -12,6 +12,6 @@ object Routes {
     val Reports = Screen("reports")
     val ReservationDetail = Screen("reservation_detail")
     val ReservationManagement = Screen("reservation_management")
-
+ val  AddEmployee = Screen("add_employee")
     data class Screen(val route: String)
 }

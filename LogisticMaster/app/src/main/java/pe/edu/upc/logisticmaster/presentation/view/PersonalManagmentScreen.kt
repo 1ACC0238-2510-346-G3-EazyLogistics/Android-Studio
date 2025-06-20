@@ -100,7 +100,9 @@ fun PersonalManagementScreen(navController: NavController, appViewModel: AppView
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                ActionButton("AGREGAR") { }
+                ActionButton("AÑADIR") {
+                    navController.navigate(Routes.AddEmployee.route)
+                }
                 ActionButton("MODIFICAR") { }
                 ActionButton("ELIMINAR") { }
             }

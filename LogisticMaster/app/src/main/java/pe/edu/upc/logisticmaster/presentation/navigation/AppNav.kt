@@ -1,5 +1,6 @@
 package pe.edu.upc.logisticmaster.presentation.navigation
 
+import AddEmployeeScreen
 import RegisterScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
@@ -48,6 +49,9 @@ fun AppNav(navController: NavHostController,    userViewModel: UserViewModel, ap
         }
         composable(Routes.ReservationManagement.route) {
             GestionReservasScreen(navController = navController)
+        }
+        composable(Routes.AddEmployee.route) {
+            AddEmployeeScreen(navController = navController)
         }
     }
 }
