@@ -3,8 +3,10 @@ package pe.edu.upc.logisticmaster.presentation.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -19,12 +21,17 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.text.font.FontWeight
+import pe.edu.upc.logisticmaster.R
+
 
 
 @Composable
 fun DetalleReservaScreen(navController: NavController) {
     val backgroundColor = Color(0xFF10BEAE)
     val cardColor = Color.White
+    val accentColor = Color(0xFF10BEAE)
     val textColor = Color.Black
 
     var detalle by remember { mutableStateOf("") }
@@ -36,119 +43,130 @@ fun DetalleReservaScreen(navController: NavController) {
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Título
+        // Card título
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
                 text = "Administración de reservas",
                 fontSize = 24.sp,
                 color = textColor,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Contenedor blanco para campos y acciones
+        // Card campos y botones
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Campo de detalle
+                Text(
+                    text = "DETALLE DE RESERVA",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = textColor,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(bottom = 8.dp)
+                )
+
                 OutlinedTextField(
                     value = detalle,
                     onValueChange = { detalle = it },
-                    label = { Text("Detalle de reserva") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    shape = RoundedCornerShape(50.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = cardColor,
-                        unfocusedContainerColor = cardColor,
+                        focusedBorderColor = accentColor,
                         unfocusedBorderColor = Color.Gray,
-                        focusedBorderColor = backgroundColor
+                        focusedContainerColor = cardColor,
+                        unfocusedContainerColor = cardColor
                     )
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Botones de acción
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Button(
-                        onClick = { /* Aceptar lógica */ },
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.White)
-                    ) {
-                        Text("ACEPTAR", color = Color.Black)
-                    }
-
-                    Button(
-                        onClick = { /* Cancelar lógica */ },
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.White)
-                    ) {
-                        Text("CANCELAR", color = Color.Black)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(
-                        onClick = { /* Estadísticas */ },
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.White)
+                        onClick = { /* Acción aceptar */ },
+                        colors = ButtonDefaults.buttonColors(containerColor = accentColor),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("ESTADÍSTICAS", color = Color.Black)
+                        Text("ACEPTAR", color = Color.White)
                     }
 
                     Button(
-                        onClick = {
-                            navController.navigate(Routes.Reports.route)
-                        },
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.White)
+                        onClick = { /* Acción cancelar */ },
+                        colors = ButtonDefaults.buttonColors(containerColor = accentColor),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("GENERAR INFORME", color = Color.Black)
+                        Text("CANCELAR", color = Color.White)
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Imagen decorativa
-                Image(
-                    painter = painterResource(id = android.R.drawable.ic_menu_gallery),
-                    contentDescription = "Estadísticas",
-                    modifier = Modifier
-                        .height(200.dp)
-                        .fillMaxWidth()
-                )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón volver
+        // Botón ESTADÍSTICAS
+        Button(
+            onClick = { /* Acción estadísticas */ },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+            shape = RoundedCornerShape(50),
+        ) {
+            Text("ESTADÍSTICAS", color = textColor)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Imagen personalizada
+        Image(
+            painter = painterResource(id = R.drawable.estadisticas), // ← debes ponerla en `res/drawable`
+            contentDescription = "Estadísticas",
+            modifier = Modifier
+                .height(180.dp)
+                .fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Botón GENERAR INFORME
+        Button(
+            onClick = { navController.navigate(Routes.Reports.route) },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+            shape = RoundedCornerShape(50)
+        ) {
+            Text("GENERAR INFORME", color = textColor)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = {
                 navController.navigate(Routes.Menu.route) {
                     popUpTo(Routes.ReservationDetail.route) { inclusive = true }
                 }
             },
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.White),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+            shape = RoundedCornerShape(30)
         ) {
-            Text("VOLVER A LA PANTALLA PRINCIPAL", color = Color.Black)
+            Text("VOLVER A LA PANTALLA PRINCIPAL", color = textColor)
         }
     }
 }
+
 
