@@ -71,7 +71,7 @@ fun RegisterScreen(navController: NavController, appViewModel: AppViewModel) {
     var confirmPassword by remember { mutableStateOf("") }
 
     val isDarkTheme by appViewModel.isDarkMode.collectAsState()
-    val backgroundColor = Color(0xFF00BCD4)
+    val backgroundColor = Color(0xFF10BEAE)
     val inputBackground = Color.White
     val inputTextColor = Color.Black
     val titleColor = Color.Black
@@ -88,7 +88,7 @@ fun RegisterScreen(navController: NavController, appViewModel: AppViewModel) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(modifier = Modifier.height(40.dp))
             Text(
-                text = "Logistics\nMaster",
+                text = "Logistics Master",
                 textAlign = TextAlign.Center,
                 color = titleColor,
                 fontSize = 30.sp,

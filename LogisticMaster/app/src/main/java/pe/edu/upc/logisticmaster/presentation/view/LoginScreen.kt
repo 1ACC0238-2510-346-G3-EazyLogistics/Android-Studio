@@ -62,6 +62,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import pe.edu.upc.logisticmaster.R
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
 import pe.edu.upc.logisticmaster.presentation.viewmodel.AppViewModel
 
@@ -140,11 +141,10 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.TempleHindu,
-                        contentDescription = "Logistic Master Logo",
-                        tint = Color.White,
-                        modifier = Modifier.size(48.dp)
+                    Image(
+                        painter = painterResource(id = R.drawable.logistics_logo),
+                        contentDescription = "Logo",
+                        modifier = Modifier.size(150.dp)
                     )
                 }
 
