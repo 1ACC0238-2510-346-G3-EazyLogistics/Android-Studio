@@ -282,7 +282,7 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
 
                     Button(
                         onClick = {
-                            navController.navigate(Routes.Reserve.route) {
+                            navController.navigate(Routes.Menu.route) {
                                 popUpTo(Routes.Login.route) { inclusive = true }
                             }
                             navController.currentBackStackEntry?.savedStateHandle?.set(
