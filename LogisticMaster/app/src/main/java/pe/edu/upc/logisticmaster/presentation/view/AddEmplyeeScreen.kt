@@ -177,8 +177,8 @@ fun CustomInputField(value: String, onValueChange: (String) -> Unit) {
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = Color(0xFF00BCD4),
-            unfocusedContainerColor = Color(0xFF00BCD4),
+            focusedContainerColor = Color(0xFF10BEAE),
+            unfocusedContainerColor = Color(0xFF10BEAE),
             focusedBorderColor = Color.Transparent,
             unfocusedBorderColor = Color.Transparent,
             focusedTextColor = Color.Black,

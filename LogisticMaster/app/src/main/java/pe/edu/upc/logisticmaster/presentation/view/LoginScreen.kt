@@ -106,14 +106,9 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.White.copy(alpha = 0.7f),
-                                Color.White.copy(alpha = 0.85f)
-                            )
-                        )
-                    )
+
+
+
             )
         }
 
@@ -139,7 +134,7 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
                             Brush.linearGradient(
                                 colors = listOf(
                                     accentColor,
-                                    Color( 0xFF00BCD4),
+                                    Color( 0xFF10BEAE),
                                 )
                             )
                         ),
@@ -159,7 +154,7 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
                     text = "Logistic Master",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = accentColor
+                    color = Color.White
                 )
 
                 Text(
