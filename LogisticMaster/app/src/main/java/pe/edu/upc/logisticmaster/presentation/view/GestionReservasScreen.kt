@@ -112,14 +112,18 @@ fun GestionReservasScreen(navController: NavController) {
                     modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Lista de empleados:", color = textColor, fontWeight = FontWeight.Bold)
+                    Text("Lista de Reservas:", color = textColor, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Button(onClick = { /* Agregar */ }) { Text("AGREGAR") }
-                        Button(onClick = { /* Modificar */ }) { Text("MODIFICAR") }
+                        Button(onClick = {
+                            navController.navigate(Routes.ReservationDetail.route)
+                        }) {
+                            Text("MODIFICAR")
+                        }
                         Button(onClick = { /* Eliminar */ }) { Text("ELIMINAR") }
                     }
                 }

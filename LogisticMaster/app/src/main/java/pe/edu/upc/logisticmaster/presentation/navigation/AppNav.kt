@@ -41,10 +41,10 @@ fun AppNav(navController: NavHostController,    userViewModel: UserViewModel, ap
             FiltersScreen(navController = navController)
         }
         composable(Routes.Reports.route) {
-            ReportScreen()
+            ReportScreen(navController = navController)
         }
         composable(Routes.ReservationDetail.route) {
-            DetalleReservaScreen()
+            DetalleReservaScreen(navController = navController)
         }
         composable(Routes.ReservationManagement.route) {
             GestionReservasScreen(navController = navController)
