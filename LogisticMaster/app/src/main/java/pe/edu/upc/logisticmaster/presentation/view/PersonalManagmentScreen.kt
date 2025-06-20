@@ -57,9 +57,9 @@ import pe.edu.upc.logisticmaster.presentation.viewmodel.AppViewModel
 
 @Composable
 fun PersonalManagementScreen(navController: NavController, appViewModel: AppViewModel) {
-    val backgroundColor = Color(0xFF00BCD4)
+    val backgroundColor = Color(0xFF10BEAE)
     val textColor = Color.Black
-    val accentColor = Color(0xFF00BCD4)
+    val accentColor = Color(0xFF10BEAE)
 
     val empleados = listOf(
         Triple("Andrea Romero", "10101", "Chef"),

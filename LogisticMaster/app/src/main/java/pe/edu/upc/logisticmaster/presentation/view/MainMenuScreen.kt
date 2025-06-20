@@ -21,7 +21,7 @@ import pe.edu.upc.logisticmaster.presentation.viewmodel.AppViewModel
 
 @Composable
 fun MainMenuScreen(navController: NavController, appViewModel: AppViewModel) {
-    val backgroundColor = Color(0xFF00BCD4)
+    val backgroundColor = Color(0xFF10BEAE)
     val textColor = Color.Black
     val logoColor = Color.White
 

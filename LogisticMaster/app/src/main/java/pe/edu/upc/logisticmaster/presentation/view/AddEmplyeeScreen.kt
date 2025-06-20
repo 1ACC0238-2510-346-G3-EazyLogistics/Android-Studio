@@ -64,9 +64,9 @@ import pe.edu.upc.logisticmaster.presentation.navigation.Routes
 import pe.edu.upc.logisticmaster.presentation.viewmodel.AppViewModel
 @Composable
 fun AddEmployeeScreen(navController: NavController) {
-    val backgroundColor = Color(0xFF00BCD4)
+    val backgroundColor = Color(0xFF10BEAE)
     val fieldColor = Color.White
-    val inputColor = Color(0xFF00BCD4)
+    val inputColor = Color(0xFF10BEAE)
 
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }

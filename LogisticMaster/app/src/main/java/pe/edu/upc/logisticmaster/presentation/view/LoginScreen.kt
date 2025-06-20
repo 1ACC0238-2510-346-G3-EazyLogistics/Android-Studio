@@ -73,12 +73,12 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
     val scrollState = rememberScrollState()
 
     val backgroundColor = if (isDarkTheme)
-        Color(0xFF00BCD4)
+        Color(0xFF10BEAE)
     else
-        Color(0xFF00BCD4)
+        Color(0xFF10BEAE)
 
     val cardColor = if (isDarkTheme)
-        Color(0xFF00BCD4)
+        Color(0xFF10BEAE)
     else
         Color.White
 
@@ -92,7 +92,7 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
     else
         Color.Black
 
-    val accentColor = Color(0xFF00BCD4)
+    val accentColor = Color(0xFF10BEAE)
 
     Box(
         modifier = Modifier
