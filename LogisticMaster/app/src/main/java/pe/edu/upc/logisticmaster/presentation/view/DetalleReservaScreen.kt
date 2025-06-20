@@ -18,12 +18,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
+import androidx.compose.material3.OutlinedTextFieldDefaults
+
 
 @Composable
 fun DetalleReservaScreen(navController: NavController) {
     val backgroundColor = Color(0xFF10BEAE)
-    val cardColor = Color(0xFFFFFFFF)
-    val textColor = Color(0xFF000000)
+    val cardColor = Color.White
+    val textColor = Color.Black
 
     var detalle by remember { mutableStateOf("") }
 
@@ -39,7 +41,7 @@ fun DetalleReservaScreen(navController: NavController) {
         // Título
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = "Administración de reservas",
@@ -51,69 +53,102 @@ fun DetalleReservaScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de detalle
-        OutlinedTextField(
-            value = detalle,
-            onValueChange = { detalle = it },
-            label = { Text("Detalle de reserva") },
+        // Contenedor blanco para campos y acciones
+        Card(
+            colors = CardDefaults.cardColors(containerColor = cardColor),
             modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Botones de acción
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Button(onClick = { /* Aceptar lógica */ }) {
-                Text("ACEPTAR")
-            }
-            Button(onClick = { /* Cancelar lógica */ }) {
-                Text("CANCELAR")
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Campo de detalle
+                OutlinedTextField(
+                    value = detalle,
+                    onValueChange = { detalle = it },
+                    label = { Text("Detalle de reserva") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = cardColor,
+                        unfocusedContainerColor = cardColor,
+                        unfocusedBorderColor = Color.Gray,
+                        focusedBorderColor = backgroundColor
+                    )
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Botones de acción
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = { /* Aceptar lógica */ },
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.White)
+                    ) {
+                        Text("ACEPTAR", color = Color.Black)
+                    }
+
+                    Button(
+                        onClick = { /* Cancelar lógica */ },
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.White)
+                    ) {
+                        Text("CANCELAR", color = Color.Black)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = { /* Estadísticas */ },
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.White)
+                    ) {
+                        Text("ESTADÍSTICAS", color = Color.Black)
+                    }
+
+                    Button(
+                        onClick = {
+                            navController.navigate(Routes.Reports.route)
+                        },
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.White)
+                    ) {
+                        Text("GENERAR INFORME", color = Color.Black)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Imagen decorativa
+                Image(
+                    painter = painterResource(id = android.R.drawable.ic_menu_gallery),
+                    contentDescription = "Estadísticas",
+                    modifier = Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Button(onClick = { /* Estadísticas */ }) {
-                Text("ESTADÍSTICAS")
-            }
-            Button(onClick = {
-                navController.navigate(Routes.Reports.route)
-            }) {
-                Text("GENERAR INFORME")
-            }
-        }
-
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Imagen de estadística o decorativa
-        Image(
-            painter = painterResource(id = android.R.drawable.ic_menu_gallery),
-            contentDescription = "Estadísticas",
-            modifier = Modifier
-                .height(200.dp)
-                .fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
+        // Botón volver
         Button(
             onClick = {
                 navController.navigate(Routes.Menu.route) {
                     popUpTo(Routes.ReservationDetail.route) { inclusive = true }
                 }
             },
+            colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.White),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
         ) {
-            Text("VOLVER A LA PANTALLA PRINCIPAL")
+            Text("VOLVER A LA PANTALLA PRINCIPAL", color = Color.Black)
         }
     }
 }
+

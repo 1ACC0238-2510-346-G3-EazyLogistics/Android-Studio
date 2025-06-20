@@ -4,14 +4,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -20,78 +24,88 @@ import pe.edu.upc.logisticmaster.presentation.navigation.Routes
 @Composable
 fun FiltersScreen(navController: NavController) {
     val backgroundColor = Color(0xFF10BEAE)
-    val cardColor = Color(0xFFFFFFFF)
-    val textColor = Color(0xFF000000)
+    val cardColor = Color.White
+    val accentColor = Color(0xFF10BEAE)
+    val textColor = Color.Black
 
-    var nombre by remember { mutableStateOf("") }
-    var habitacion by remember { mutableStateOf("") }
-    var fechas by remember { mutableStateOf("") }
-    var estado by remember { mutableStateOf("") }
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(24.dp)
     ) {
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Card(
-            colors = CardDefaults.cardColors(containerColor = cardColor),
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("FILTROS DE BUSQUEDA", fontSize = 24.sp, color = textColor)
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre de reserva") },
-                    modifier = Modifier.fillMaxWidth()
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = cardColor),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                Text(
+                    text = "FILTROS DE BUSQUEDA",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = textColor,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
-                OutlinedTextField(
-                    value = habitacion,
-                    onValueChange = { habitacion = it },
-                    label = { Text("Habitación") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = fechas,
-                    onValueChange = { fechas = it },
-                    label = { Text("Fechas") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = estado,
-                    onValueChange = { estado = it },
-                    label = { Text("Estado de reserva") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+            }
+            // Card blanco con campos y botones
+            Card(
+                colors = CardDefaults.cardColors(containerColor = cardColor),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(onClick = {
-                        navController.popBackStack() // vuelve atrás sin aplicar
-                    }) {
-                        Text("CANCELAR")
+                    listOf(
+                        "Nombre de reserva",
+                        "Habitación",
+                        "Fechas",
+                        "Estado de reserva"
+                    ).forEach { placeholder ->
+                        TextField(
+                            value = "",
+                            onValueChange = {},
+                            placeholder = { Text(placeholder) },
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color(0xFFF1F1F1),
+                                unfocusedContainerColor = Color(0xFFF1F1F1),
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        )
                     }
 
-                    Button(onClick = {
-                        navController.navigate(Routes.ReservationManagement.route) {
-                            popUpTo(Routes.Filters.route) { inclusive = true }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Button(
+                            onClick = { navController.popBackStack() },
+                            colors = ButtonDefaults.buttonColors(containerColor = accentColor)
+                        ) {
+                            Text("CANCELAR", color = Color.White)
                         }
-                    }) {
-                        Text("APLICAR")
+
+                        Button(
+                            onClick = { navController.navigate(Routes.ReservationManagement.route) },
+                            colors = ButtonDefaults.buttonColors(containerColor = accentColor)
+                        ) {
+                            Text("APLICAR", color = Color.White)
+                        }
                     }
                 }
             }
         }
     }
 }
+
+
