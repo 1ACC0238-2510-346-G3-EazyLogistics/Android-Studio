@@ -3,8 +3,6 @@ package pe.edu.upc.logisticmaster.presentation.navigation
 import AddEmployeeScreen
 import RegisterScreen
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,6 +11,7 @@ import pe.edu.upc.logisticmaster.presentation.view.FiltersScreen
 import pe.edu.upc.logisticmaster.presentation.view.GestionReservasScreen
 import pe.edu.upc.logisticmaster.presentation.view.LoginScreen
 import pe.edu.upc.logisticmaster.presentation.view.MainMenuScreen
+import pe.edu.upc.logisticmaster.presentation.view.ModificarEmpleadoScreen
 import pe.edu.upc.logisticmaster.presentation.view.PersonalManagementScreen
 import pe.edu.upc.logisticmaster.presentation.view.ReportScreen
 import pe.edu.upc.logisticmaster.presentation.viewmodel.AppViewModel
@@ -52,6 +51,9 @@ fun AppNav(navController: NavHostController,    userViewModel: UserViewModel, ap
         }
         composable(Routes.AddEmployee.route) {
             AddEmployeeScreen(navController = navController)
+        }
+        composable(Routes.ModificarEmpleado.route) {
+            ModificarEmpleadoScreen(navController = navController)
         }
     }
 }

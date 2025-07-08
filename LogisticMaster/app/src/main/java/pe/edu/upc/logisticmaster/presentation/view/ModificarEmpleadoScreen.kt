@@ -1,11 +1,8 @@
 package pe.edu.upc.logisticmaster.presentation.view
 
-import ActionButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.TempleHindu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,12 +14,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
-import pe.edu.upc.logisticmaster.presentation.viewmodel.AppViewModel
 
 @Composable
-fun PersonalManagementScreen(navController: NavController, appViewModel: AppViewModel) {
+fun ModificarEmpleadoScreen(navController: NavController) {
     val backgroundColor = Color(0xFF10BEAE)
-    val textColor = Color.Black
     val accentColor = Color(0xFF10BEAE)
 
     val empleados = listOf(
@@ -31,7 +26,7 @@ fun PersonalManagementScreen(navController: NavController, appViewModel: AppView
         Triple("Patricia Gutierrez", "10103", "Chef"),
         Triple("Emily Polo", "10104", "Chef"),
         Triple("Miguel Polo", "10105", "Chef"),
-        Triple("Walter Polo", "10106", "Chef"),
+        Triple("Walter Polo", "10106", "Chef")
     )
 
     Column(
@@ -44,36 +39,14 @@ fun PersonalManagementScreen(navController: NavController, appViewModel: AppView
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Gestión de\npersonal",
-                textAlign = TextAlign.Center,
-                color = textColor,
-                fontSize = 28.sp,
+                text = "Lista de empleados",
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
+                color = Color.Black,
                 modifier = Modifier
                     .background(Color.White, RoundedCornerShape(12.dp))
-                    .padding(vertical = 8.dp, horizontal = 24.dp)
+                    .padding(horizontal = 24.dp, vertical = 8.dp)
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(text = "Lista de empleados:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                ActionButton("AÑADIR") {
-                    navController.navigate(Routes.AddEmployee.route)
-                }
-                ActionButton("MODIFICAR") {
-                    navController.navigate(Routes.ModificarEmpleado.route)
-                }
-                ActionButton("ELIMINAR") {
-                    // Implementar lógica si se desea
-                }
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -124,26 +97,28 @@ fun PersonalManagementScreen(navController: NavController, appViewModel: AppView
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            MenuButton("Asignar tareas") {
-                // Acción si se desea
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            MenuButton("Volver") {
-                navController.navigate(Routes.Menu.route) {
-                    popUpTo(Routes.PersonalManagement.route) { inclusive = true }
-                }
+            Button(
+                onClick = {
+                    navController.navigate(Routes.PersonalManagement.route) {
+                        popUpTo(Routes.ModificarEmpleado.route) { inclusive = true }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                ),
+                shape = RoundedCornerShape(10.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text("Volver", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Default.TempleHindu,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(48.dp)
-            )
+            Spacer(modifier = Modifier.height(12.dp))
             Text("LogisticsMasters", color = Color.White, fontWeight = FontWeight.Bold)
             Text("Potenciando la experiencia hotelera", color = Color.White, fontSize = 12.sp)
         }
