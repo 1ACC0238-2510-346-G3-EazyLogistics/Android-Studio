@@ -66,6 +66,9 @@ import pe.edu.upc.logisticmaster.presentation.viewmodel.AppViewModel
 
 @Composable
 fun RegisterScreen(navController: NavController, appViewModel: AppViewModel) {
+    var usuario by remember { mutableStateOf("") }
+    var nombre by remember { mutableStateOf("") }
+    var apellido by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -98,6 +101,12 @@ fun RegisterScreen(navController: NavController, appViewModel: AppViewModel) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            InputField(label = "USERNAME", value = usuario, onValueChange = { usuario = it })
+            Spacer(modifier = Modifier.height(16.dp))
+            InputField(label = "NOMBRE", value = nombre, onValueChange = { nombre = it })
+            Spacer(modifier = Modifier.height(16.dp))
+            InputField(label = "APELLIDO", value = apellido, onValueChange = { apellido = it })
+            Spacer(modifier = Modifier.height(16.dp))
             InputField(label = "EMAIL", value = email, onValueChange = { email = it })
             Spacer(modifier = Modifier.height(16.dp))
             InputField(label = "CONTRASEÑA", value = password, onValueChange = { password = it }, isPassword = true)
