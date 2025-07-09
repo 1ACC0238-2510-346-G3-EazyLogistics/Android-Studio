@@ -34,6 +34,8 @@ import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerFormState
 import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerUiState
 import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerViewModel
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import pe.edu.upc.logisticmaster.presentation.view.ActionButton
 
 
@@ -45,7 +47,7 @@ fun AddEmployeeScreen(
     val backgroundColor = Color(0xFF10BEAE)
     val fieldColor      = Color.White
 
-    // Trigger form reset
+    // Resetear el formulario al entrar
     LaunchedEffect(Unit) {
         workerViewModel.updateForm { WorkerFormState() }
     }
@@ -119,7 +121,10 @@ fun AddEmployeeScreen(
                     )
                     Spacer(Modifier.height(12.dp))
 
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
                         Column(Modifier.weight(1f)) {
                             InputLabel("PUESTO")
                             OutlinedTextField(
@@ -152,7 +157,6 @@ fun AddEmployeeScreen(
 
             Spacer(Modifier.height(20.dp))
 
-            // Show loading or error
             when (uiState) {
                 is WorkerUiState.Loading -> CircularProgressIndicator(color = Color.White)
                 is WorkerUiState.Error   -> Text(
@@ -162,18 +166,30 @@ fun AddEmployeeScreen(
                 else -> { /* no-op */ }
             }
 
+            // --- Botones estándar en lugar de ActionButton ---
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                ActionButton(text = "CANCELAR") {
-                    navController.popBackStack()
+                Button(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                ) {
+                    Text("CANCELAR", color = Color.Black, fontWeight = FontWeight.Bold)
                 }
-                ActionButton(text = "AÑADIR") {
-                    workerViewModel.createWorker()
+                Button(
+                    onClick = { workerViewModel.createWorker() },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                ) {
+                    Text("AÑADIR", color = Color.Black, fontWeight = FontWeight.Bold)
                 }
             }
-
         }
 
         // Footer logo

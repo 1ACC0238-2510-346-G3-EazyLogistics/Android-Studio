@@ -1,15 +1,7 @@
 package pe.edu.upc.logisticmaster.presentation.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TempleHindu
@@ -17,11 +9,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,28 +25,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
-import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerViewModel
-
+import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveFormState
+import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveUiState
+import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveViewModel
 
 @Composable
-fun FilterScreen(
-    navController: NavController
+fun DetalleReservaScreen(
+    navController: NavController,
+    reserveViewModel: ReserveViewModel
 ) {
     val backgroundColor = Color(0xFF10BEAE)
-    val cardColor       = Color.White
+    val fieldColor      = Color.White
     val accentColor     = Color(0xFF10BEAE)
     val textColor       = Color.Black
 
-    var nombreHuesped by remember { mutableStateOf("") }
-    var habitacion by remember { mutableStateOf("") }
-    var fechaReserva by remember { mutableStateOf("") }
-    var horaIngreso by remember { mutableStateOf("") }
-    var horaSalida by remember { mutableStateOf("") }
+    // Initialize form (either blank for "new" or loaded)
+    LaunchedEffect(Unit) {
+        reserveViewModel.loadCurrentReserve()
+    }
+
+    val form by reserveViewModel.formState.collectAsState()
+    val uiState by reserveViewModel.uiState.collectAsState(initial = ReserveUiState.Idle)
 
     Column(
         modifier = Modifier
@@ -60,153 +58,114 @@ fun FilterScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Card(
-            colors   = CardDefaults.cardColors(containerColor = cardColor),
-            shape    = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text      = "FILTROS DE BÚSQUEDA",
-                fontSize  = 20.sp,
-                fontWeight= FontWeight.Bold,
-                color     = textColor,
-                modifier  = Modifier
-                    .padding(vertical = 16.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-        }
+        Text(
+            text = "Detalle de reserva",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = textColor,
+            modifier = Modifier
+                .background(fieldColor, RoundedCornerShape(12.dp))
+                .padding(vertical = 8.dp, horizontal = 16.dp)
+        )
 
         Spacer(Modifier.height(16.dp))
 
         Card(
-            colors   = CardDefaults.cardColors(containerColor = cardColor),
-            shape    = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = fieldColor),
+            elevation = CardDefaults.cardElevation(6.dp)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                InputLabel("NOMBRE DE HUESPED")
+            Column(Modifier.padding(16.dp)) {
                 OutlinedTextField(
-                    value = nombreHuesped,
-                    onValueChange = { nombreHuesped = it },
-                    singleLine = true,
+                    value = form.nombreHuespedes,
+                    onValueChange = { reserveViewModel.updateForm { copy(nombreHuespedes = it) } },
+                    label = { Text("Nombre huéspedes") },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor   = accentColor,
-                        unfocusedContainerColor = accentColor,
-                        focusedTextColor        = textColor,
-                        unfocusedTextColor      = textColor,
-                        focusedBorderColor      = Color.Transparent,
-                        unfocusedBorderColor    = Color.Transparent
+                        focusedContainerColor = accentColor,
+                        unfocusedContainerColor = accentColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-
                 Spacer(Modifier.height(12.dp))
-                InputLabel("HABITACIÓN")
                 OutlinedTextField(
-                    value = habitacion,
-                    onValueChange = { habitacion = it },
-                    singleLine = true,
+                    value = form.habitacion,
+                    onValueChange = { reserveViewModel.updateForm { copy(habitacion = it) } },
+                    label = { Text("Habitación") },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor   = accentColor,
-                        unfocusedContainerColor = accentColor,
-                        focusedTextColor        = textColor,
-                        unfocusedTextColor      = textColor,
-                        focusedBorderColor      = Color.Transparent,
-                        unfocusedBorderColor    = Color.Transparent
+                        focusedContainerColor = accentColor,
+                        unfocusedContainerColor = accentColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-
                 Spacer(Modifier.height(12.dp))
-                InputLabel("FECHA DE RESERVA")
                 OutlinedTextField(
-                    value = fechaReserva,
-                    onValueChange = { fechaReserva = it },
-                    singleLine = true,
+                    value = form.horaIngreso,
+                    onValueChange = { reserveViewModel.updateForm { copy(horaIngreso = it) } },
+                    label = { Text("Hora ingreso") },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor   = accentColor,
-                        unfocusedContainerColor = accentColor,
-                        focusedTextColor        = textColor,
-                        unfocusedTextColor      = textColor,
-                        focusedBorderColor      = Color.Transparent,
-                        unfocusedBorderColor    = Color.Transparent
+                        focusedContainerColor = accentColor,
+                        unfocusedContainerColor = accentColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-
                 Spacer(Modifier.height(12.dp))
-                InputLabel("HORA DE INGRESO")
                 OutlinedTextField(
-                    value = horaIngreso,
-                    onValueChange = { horaIngreso = it },
-                    singleLine = true,
+                    value = form.horaSalida,
+                    onValueChange = { reserveViewModel.updateForm { copy(horaSalida = it) } },
+                    label = { Text("Hora salida") },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor   = accentColor,
-                        unfocusedContainerColor = accentColor,
-                        focusedTextColor        = textColor,
-                        unfocusedTextColor      = textColor,
-                        focusedBorderColor      = Color.Transparent,
-                        unfocusedBorderColor    = Color.Transparent
+                        focusedContainerColor = accentColor,
+                        unfocusedContainerColor = accentColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
+            }
+        }
 
-                Spacer(Modifier.height(12.dp))
-                InputLabel("HORA DE SALIDA")
-                OutlinedTextField(
-                    value = horaSalida,
-                    onValueChange = { horaSalida = it },
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor   = accentColor,
-                        unfocusedContainerColor = accentColor,
-                        focusedTextColor        = textColor,
-                        unfocusedTextColor      = textColor,
-                        focusedBorderColor      = Color.Transparent,
-                        unfocusedBorderColor    = Color.Transparent
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
+        Spacer(Modifier.height(16.dp))
 
-                Spacer(Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Button(
-                        onClick = { navController.popBackStack() },
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-                    ) {
-                        Text("CANCELAR", color = Color.Black, fontWeight = FontWeight.Bold)
-                    }
+        when (uiState) {
+            is ReserveUiState.Loading -> CircularProgressIndicator(color = Color.White)
+            is ReserveUiState.Error   -> Text(
+                text = (uiState as ReserveUiState.Error).message,
+                color = Color.Red,
+                modifier = Modifier.padding(8.dp)
+            )
+            else -> { /* no-op */ }
+        }
 
-                    Button(
-                        onClick = { WorkerViewModel.createWorker() },
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-                    ) {
-                        Text("AÑADIR", color = Color.Black, fontWeight = FontWeight.Bold)
-                    }
-                }
-
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Button(
+                onClick = {
+                    reserveViewModel.submitReserve()
+                    navController.popBackStack()
+                },
+                modifier = Modifier.weight(1f).height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+            ) {
+                Text("ACEPTAR", color = Color.Black, fontWeight = FontWeight.Bold)
+            }
+            Button(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.weight(1f).height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+            ) {
+                Text("CANCELAR", color = Color.Black, fontWeight = FontWeight.Bold)
             }
         }
 
         Spacer(Modifier.height(24.dp))
 
         Icon(
-            imageVector   = Icons.Default.TempleHindu,
+            imageVector = Icons.Default.TempleHindu,
             contentDescription = null,
-            tint          = Color.White,
-            modifier      = Modifier.size(48.dp)
+            tint = Color.White,
+            modifier = Modifier.size(48.dp)
         )
-        Text(
-            "LogisticsMasters",
-            color     = Color.White,
-            fontSize  = 16.sp,
-            fontWeight= FontWeight.Bold
-        )
+        Text("LogisticsMasters", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
