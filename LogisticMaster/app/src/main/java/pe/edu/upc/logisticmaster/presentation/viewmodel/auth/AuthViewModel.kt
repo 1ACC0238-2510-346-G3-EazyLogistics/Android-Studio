@@ -8,7 +8,6 @@ import kotlinx.coroutines.launch
 import pe.edu.upc.logisticmaster.data.remote.api.AuthApiService
 import pe.edu.upc.logisticmaster.data.remote.dto.LoginRequest
 import pe.edu.upc.logisticmaster.data.remote.dto.RegisterRequest
-import pe.edu.upc.logisticmaster.data.remote.dto.UsuarioDto
 
 class AuthViewModel(
     private val api: AuthApiService
@@ -21,13 +20,8 @@ class AuthViewModel(
         viewModelScope.launch {
             _state.value = AuthUiState.Loading
             try {
-                val user: UsuarioDto = api.login(
-                    LoginRequest(
-                        usuario    = model.usuario,
-                        contrasena = model.contrasena
-                    )
-                )
-                _state.value = AuthUiState.Success("Login exitoso: ${user.usuario}")
+                api.login(LoginRequest(model.usuario, model.contrasena))
+                _state.value = AuthUiState.Success("Login exitoso")
             } catch (e: Exception) {
                 _state.value = AuthUiState.Error(e.message.orEmpty())
             }
@@ -38,16 +32,14 @@ class AuthViewModel(
         viewModelScope.launch {
             _state.value = AuthUiState.Loading
             try {
-                val user: UsuarioDto = api.register(
-                    RegisterRequest(
-                        nombre     = model.nombre,
-                        apellido   = model.apellido,
-                        usuario    = model.usuario,
-                        email      = model.email,
-                        contrasena = model.contrasena
-                    )
-                )
-                _state.value = AuthUiState.Success("Registro exitoso: ${user.usuario}")
+                api.register(RegisterRequest(
+                    model.nombre,
+                    model.apellido,
+                    model.usuario,
+                    model.email,
+                    model.contrasena
+                ))
+                _state.value = AuthUiState.Success("Registro exitoso")
             } catch (e: Exception) {
                 _state.value = AuthUiState.Error(e.message.orEmpty())
             }
