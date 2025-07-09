@@ -48,18 +48,19 @@ fun FilterScreen(
     val textColor       = Color.Black
 
     var nombreHuesped by remember { mutableStateOf("") }
-    var habitacion by remember { mutableStateOf("") }
-    var fechaReserva by remember { mutableStateOf("") }
-    var horaIngreso by remember { mutableStateOf("") }
-    var horaSalida by remember { mutableStateOf("") }
+    var habitacion    by remember { mutableStateOf("") }
+    var fechaReserva  by remember { mutableStateOf("") }
+    var horaIngreso   by remember { mutableStateOf("") }
+    var horaSalida    by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
+        modifier            = Modifier
             .fillMaxSize()
             .background(backgroundColor)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Título
         Card(
             colors   = CardDefaults.cardColors(containerColor = cardColor),
             shape    = RoundedCornerShape(12.dp),
@@ -79,13 +80,14 @@ fun FilterScreen(
 
         Spacer(Modifier.height(16.dp))
 
+        // Campos de filtro
         Card(
             colors   = CardDefaults.cardColors(containerColor = cardColor),
             shape    = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                InputLabel("NOMBRE DE HUESPED")
+                InputLabel("NOMBRE DE HUÉSPED")
                 OutlinedTextField(
                     value = nombreHuesped,
                     onValueChange = { nombreHuesped = it },
@@ -170,46 +172,52 @@ fun FilterScreen(
                 )
 
                 Spacer(Modifier.height(16.dp))
+
+                // Botones Cancelar / Buscar
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier              = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Button(
                         onClick = { navController.popBackStack() },
-                        modifier = Modifier.weight(1f).height(48.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                     ) {
                         Text("CANCELAR", color = Color.Black, fontWeight = FontWeight.Bold)
                     }
 
                     Button(
-                        onClick = { WorkerViewModel.createWorker() },
+                        onClick = {
+                            // Aquí podrías aplicar tu lógica de filtro...
+                            // Por ahora, volvemos a la lista de reservas
+                            navController.navigate(Routes.ReservationManagement.route)
+                        },
                         modifier = Modifier
                             .weight(1f)
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                     ) {
-                        Text("AÑADIR", color = Color.Black, fontWeight = FontWeight.Bold)
+                        Text("BUSCAR", color = Color.Black, fontWeight = FontWeight.Bold)
                     }
-
                 }
-
             }
         }
 
         Spacer(Modifier.height(24.dp))
 
         Icon(
-            imageVector   = Icons.Default.TempleHindu,
+            imageVector        = Icons.Default.TempleHindu,
             contentDescription = null,
-            tint          = Color.White,
-            modifier      = Modifier.size(48.dp)
+            tint               = Color.White,
+            modifier           = Modifier.size(48.dp)
         )
         Text(
-            "LogisticsMasters",
-            color     = Color.White,
-            fontSize  = 16.sp,
-            fontWeight= FontWeight.Bold
+            text       = "LogisticsMasters",
+            color      = Color.White,
+            fontSize   = 16.sp,
+            fontWeight = FontWeight.Bold
         )
     }
 }

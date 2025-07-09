@@ -45,4 +45,8 @@ class AuthViewModel(
             }
         }
     }
+
+    fun logout() {
+        _state.value = AuthUiState.Idle
+    }
 }

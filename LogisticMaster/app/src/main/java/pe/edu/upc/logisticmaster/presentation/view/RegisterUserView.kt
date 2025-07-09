@@ -75,66 +75,121 @@ fun RegisterScreen(
                 elevation = CardDefaults.cardElevation(6.dp)
             ) {
                 Column(Modifier.padding(16.dp)) {
-                    InputLabel("NOMBRE")
-                    CustomInputField(value = nombre, onValueChange = { nombre = it })
-
+                    // Nombre
+                    OutlinedTextField(
+                        value = nombre,
+                        onValueChange = { nombre = it },
+                        label = { Text("Nombre") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor   = backgroundColor,
+                            unfocusedContainerColor = backgroundColor,
+                            focusedTextColor        = Color.Black,
+                            unfocusedTextColor      = Color.Black,
+                            focusedBorderColor      = Color.Transparent,
+                            unfocusedBorderColor    = Color.Transparent
+                        )
+                    )
                     Spacer(Modifier.height(12.dp))
-                    InputLabel("APELLIDO")
-                    CustomInputField(value = apellido, onValueChange = { apellido = it })
-
+                    // Apellido
+                    OutlinedTextField(
+                        value = apellido,
+                        onValueChange = { apellido = it },
+                        label = { Text("Apellido") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor   = backgroundColor,
+                            unfocusedContainerColor = backgroundColor,
+                            focusedTextColor        = Color.Black,
+                            unfocusedTextColor      = Color.Black,
+                            focusedBorderColor      = Color.Transparent,
+                            unfocusedBorderColor    = Color.Transparent
+                        )
+                    )
                     Spacer(Modifier.height(12.dp))
-                    InputLabel("USUARIO")
-                    CustomInputField(value = usuario, onValueChange = { usuario = it })
-
+                    // Usuario
+                    OutlinedTextField(
+                        value = usuario,
+                        onValueChange = { usuario = it },
+                        label = { Text("Usuario") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor   = backgroundColor,
+                            unfocusedContainerColor = backgroundColor,
+                            focusedTextColor        = Color.Black,
+                            unfocusedTextColor      = Color.Black,
+                            focusedBorderColor      = Color.Transparent,
+                            unfocusedBorderColor    = Color.Transparent
+                        )
+                    )
                     Spacer(Modifier.height(12.dp))
-                    InputLabel("EMAIL")
-                    CustomInputField(value = email, onValueChange = { email = it })
-
+                    // Email
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Email") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor   = backgroundColor,
+                            unfocusedContainerColor = backgroundColor,
+                            focusedTextColor        = Color.Black,
+                            unfocusedTextColor      = Color.Black,
+                            focusedBorderColor      = Color.Transparent,
+                            unfocusedBorderColor    = Color.Transparent
+                        )
+                    )
                     Spacer(Modifier.height(12.dp))
-                    InputLabel("CONTRASEÑA")
+                    // Contraseña
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
                         singleLine = true,
+                        label = { Text("Contraseña") },
                         visualTransformation = if (passwordVisible)
                             VisualTransformation.None
                         else
                             PasswordVisualTransformation(),
                         trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                val image = if (passwordVisible)
+                                    Icons.Default.VisibilityOff
+                                else
+                                    Icons.Default.Visibility
+                                val description = if (passwordVisible)
+                                    "Ocultar contraseña"
+                                else
+                                    "Mostrar contraseña"
                                 Icon(
-                                    imageVector = if (passwordVisible)
-                                        Icons.Default.VisibilityOff
-                                    else
-                                        Icons.Default.Visibility,
-                                    contentDescription = if (passwordVisible)
-                                        "Ocultar contraseña"
-                                    else
-                                        "Mostrar contraseña"
+                                    imageVector = image,
+                                    contentDescription = description
                                 )
                             }
                         },
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = backgroundColor,
+                            focusedContainerColor   = backgroundColor,
                             unfocusedContainerColor = backgroundColor,
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
-                        ),
-                        modifier = Modifier.fillMaxWidth()
+                            focusedBorderColor      = Color.Transparent,
+                            unfocusedBorderColor    = Color.Transparent,
+                            focusedTextColor        = Color.Black,
+                            unfocusedTextColor      = Color.Black
+                        )
                     )
+
                 }
             }
 
             Spacer(Modifier.height(20.dp))
 
-            when (val state = authState) {
+            when (authState) {
                 is AuthUiState.Loading -> CircularProgressIndicator(color = Color.White)
                 is AuthUiState.Error -> {
                     Text(
-                        text = state.message,
+                        text = (authState as AuthUiState.Error).message,
                         color = Color.Red,
                         modifier = Modifier.padding(8.dp)
                     )
@@ -142,23 +197,38 @@ fun RegisterScreen(
                 else -> Unit
             }
 
+            // Botones estándar
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                ActionButton(text = "CANCELAR") {
-                    navController.popBackStack()
+                Button(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                ) {
+                    Text("CANCELAR", color = Color.Black, fontWeight = FontWeight.Bold)
                 }
-                ActionButton(text = "REGISTRAR") {
-                    viewModel.register(
-                        RegisterUiModel(
-                            nombre     = nombre,
-                            apellido   = apellido,
-                            usuario    = usuario,
-                            email      = email,
-                            contrasena = password
+                Button(
+                    onClick = {
+                        viewModel.register(
+                            RegisterUiModel(
+                                nombre     = nombre,
+                                apellido   = apellido,
+                                usuario    = usuario,
+                                email      = email,
+                                contrasena = password
+                            )
                         )
-                    )
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                ) {
+                    Text("REGISTRAR", color = Color.Black, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -175,4 +245,3 @@ fun RegisterScreen(
         }
     }
 }
-

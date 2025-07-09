@@ -43,7 +43,7 @@ fun PersonalManagementScreen(
         workerViewModel.loadWorkers()
     }
 
-    // Observa el estado de UI (Idle, Loading, Loaded, Error)
+    // Observa el estado de UI
     val uiState by workerViewModel.uiState.collectAsState(initial = WorkerUiState.Idle)
     val empleados = when (uiState) {
         is WorkerUiState.Loaded -> (uiState as WorkerUiState.Loaded).list
@@ -71,10 +71,10 @@ fun PersonalManagementScreen(
         Spacer(Modifier.height(16.dp))
 
         Card(
-            modifier    = Modifier.fillMaxWidth(),
-            shape       = RoundedCornerShape(16.dp),
-            colors      = cardColors(containerColor = Color.White),
-            elevation   = CardDefaults.cardElevation(8.dp)
+            modifier  = Modifier.fillMaxWidth(),
+            shape     = RoundedCornerShape(16.dp),
+            colors    = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(
@@ -82,7 +82,7 @@ fun PersonalManagementScreen(
                     horizontalArrangement= Arrangement.SpaceBetween
                 ) {
                     Text("NOMBRE", fontWeight = FontWeight.Bold)
-                    Text("ID", fontWeight = FontWeight.Bold)
+                    Text("ID",     fontWeight = FontWeight.Bold)
                     Text("PUESTO", fontWeight = FontWeight.Bold)
                 }
                 Spacer(Modifier.height(8.dp))
@@ -95,7 +95,7 @@ fun PersonalManagementScreen(
                                 navController.navigate("${Routes.ModificarEmpleado.route}/${w.id}")
                             },
                         shape  = RoundedCornerShape(12.dp),
-                        colors = cardColors(containerColor = accentColor)
+                        colors = CardDefaults.cardColors(containerColor = accentColor)
                     ) {
                         Row(
                             modifier              = Modifier
@@ -114,35 +114,54 @@ fun PersonalManagementScreen(
 
         Spacer(Modifier.height(24.dp))
 
+        // Botones de acción con Button estándar
         Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier              = Modifier.fillMaxWidth()
+            modifier              = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            ActionButton(text = "AÑADIR") {
-                navController.navigate(Routes.AddEmployee.route)
+            Button(
+                onClick = { navController.navigate(Routes.AddEmployee.route) },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+            ) {
+                Text("AÑADIR", color = Color.Black, fontWeight = FontWeight.Bold)
             }
-            ActionButton(text = "ELIMINAR") {
-                // lógica de eliminación
+            Button(
+                onClick = { /* lógica de eliminación */ },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+            ) {
+                Text("ELIMINAR", color = Color.Black, fontWeight = FontWeight.Bold)
             }
-            ActionButton(text = "VER TAREAS") {
-                // navegar a pantalla de tareas
+            Button(
+                onClick = { /* navegar a pantalla de tareas */ },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+            ) {
+                Text("VER TAREAS", color = Color.Black, fontWeight = FontWeight.Bold)
             }
         }
 
         Spacer(Modifier.weight(1f))
 
+        // Logout → vuelve al login limpiando sesión
         Button(
             onClick = {
-                workerViewModel.logout()
+                authViewModel.logout()
                 navController.navigate(Routes.Login.route) {
                     popUpTo(Routes.Menu.route) { inclusive = true }
                 }
             },
-            colors   = ButtonDefaults.buttonColors(containerColor = Color.White),
-            shape    = RoundedCornerShape(8.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
+                .height(48.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
         ) {
             Text("Volver", color = textColor, fontWeight = FontWeight.Bold)
         }

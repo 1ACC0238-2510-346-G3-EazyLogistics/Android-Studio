@@ -45,7 +45,7 @@ fun DetalleReservaScreen(
 
     // Initialize form (either blank for "new" or loaded)
     LaunchedEffect(Unit) {
-        reserveViewModel.loadCurrentReserve()
+        reserveViewModel.updateForm { ReserveFormState() }
     }
 
     val form by reserveViewModel.formState.collectAsState()
@@ -141,17 +141,22 @@ fun DetalleReservaScreen(
         ) {
             Button(
                 onClick = {
-                    reserveViewModel.submitReserve()
+                    // Llama a createReserve en lugar de submitReserve()
+                    reserveViewModel.createReserve()
                     navController.popBackStack()
                 },
-                modifier = Modifier.weight(1f).height(48.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White)
             ) {
                 Text("ACEPTAR", color = Color.Black, fontWeight = FontWeight.Bold)
             }
             Button(
                 onClick = { navController.popBackStack() },
-                modifier = Modifier.weight(1f).height(48.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White)
             ) {
                 Text("CANCELAR", color = Color.Black, fontWeight = FontWeight.Bold)
