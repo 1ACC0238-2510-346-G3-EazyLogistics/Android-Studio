@@ -1,0 +1,53 @@
+package pe.edu.upc.logisticmaster.data.repository
+
+import pe.edu.upc.logisticmaster.domain.model.Worker
+import pe.edu.upc.logisticmaster.data.remote.api.WorkerApiService
+import pe.edu.upc.logisticmaster.data.remote.dto.WorkerDto
+
+class WorkerRepositoryImpl(
+    private val api: WorkerApiService
+) : WorkerRepository {
+
+    override suspend fun getAllWorkers(): List<Worker> =
+        api.getAll().map { it.toDomain() }
+
+    override suspend fun getWorkerById(id: Long): Worker =
+        api.getById(id).toDomain()
+
+    override suspend fun createWorker(worker: Worker): Worker {
+        val dto = worker.toDto()
+        val saved = api.create(dto)
+        return saved.toDomain()
+    }
+
+    override suspend fun updateWorker(id: Long, worker: Worker): Worker {
+        val dto = worker.toDto()
+        val updated = api.update(id, dto)
+        return updated.toDomain()
+    }
+
+    override suspend fun deleteWorker(id: Long) {
+        api.delete(id)
+    }
+
+    // --- Mappers DTO <-> Dominio ---
+    private fun WorkerDto.toDomain() = Worker(
+        id       = this.id,
+        nombre   = this.nombre,
+        apellido = this.apellido,
+        email    = this.email,
+        telefono = this.telefono,
+        puesto   = this.puesto,
+        area     = this.area
+    )
+
+    private fun Worker.toDto() = WorkerDto(
+        id       = this.id ?: 0L,
+        nombre   = this.nombre,
+        apellido = this.apellido,
+        email    = this.email,
+        telefono = this.telefono,
+        puesto   = this.puesto,
+        area     = this.area
+    )
+}

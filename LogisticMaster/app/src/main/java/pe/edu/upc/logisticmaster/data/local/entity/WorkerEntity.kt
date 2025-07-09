@@ -5,8 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "workers")
 data class WorkerEntity(
-    @PrimaryKey val id: Int,
+    @PrimaryKey val id: Long,
     val nombre: String,
+    val apellido: String,
     val email: String,
     val telefono: String,
     val puesto: String,
