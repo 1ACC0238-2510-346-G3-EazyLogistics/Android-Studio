@@ -173,7 +173,10 @@ fun LoginScreen(
         // Botón Login
         Button(
             onClick = {
-                viewModel.login(LoginUiModel(usuario, password))
+                viewModel.login(
+                    usuario   = usuario,
+                    contrasena = password
+                )
             },
             modifier = Modifier
                 .fillMaxWidth()
