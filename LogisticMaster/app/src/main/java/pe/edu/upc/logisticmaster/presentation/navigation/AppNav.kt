@@ -31,7 +31,7 @@ fun AppNav(
             MainMenuScreen(navController, authViewModel)
         }
         composable(Routes.PersonalManagement.route) {
-            PersonalManagmentScreen(
+            PersonalManagementScreen(
                 navController    = navController,
                 workerViewModel  = workerViewModel,
                 authViewModel    = authViewModel
@@ -44,13 +44,13 @@ fun AppNav(
             )
         }
         composable(Routes.ModificarEmpleado.route) {
-            ModificarEmpleadoScreen(navController)
+            ModificarEmpleadoScreen(navController, workerViewModel)
         }
         composable(Routes.ReservationManagement.route) {
             GestionReservasScreen(navController, reserveViewModel)
         }
         composable(Routes.ReservationDetail.route) {
-            DetalleReservaScreen(navController)
+            DetalleReservaScreen(navController, reserveViewModel)
         }
         composable(Routes.Filters.route) {
             FilterScreen(navController)

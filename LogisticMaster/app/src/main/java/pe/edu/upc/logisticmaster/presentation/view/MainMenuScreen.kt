@@ -23,11 +23,13 @@ import pe.edu.upc.logisticmaster.presentation.navigation.Routes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TempleHindu
 import androidx.navigation.NavHostController
+import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.AuthViewModel
 
 
 @Composable
-fun NavController.MainMenuScreen(
-    navController: NavHostController
+fun MainMenuScreen(
+    navController: NavHostController,
+    authViewModel: AuthViewModel
 ) {
     val backgroundColor = Color(0xFF10BEAE)
     val cardColor       = Color.White
@@ -75,7 +77,7 @@ fun NavController.MainMenuScreen(
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { this@MainMenuScreen.navigate(Routes.PersonalManagement.route) }
+                    .clickable { navController.navigate(Routes.PersonalManagement.route) }
             ) {
                 Text(
                     text = "Gestión de personal",
@@ -95,7 +97,7 @@ fun NavController.MainMenuScreen(
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { this@MainMenuScreen.navigate(Routes.ReservationManagement.route) }
+                    .clickable { navController.navigate(Routes.ReservationManagement.route) }
             ) {
                 Text(
                     text = "Administración de reservas",
@@ -110,9 +112,14 @@ fun NavController.MainMenuScreen(
             }
         }
 
-        // Botón Volver (logout)
+        // Botón Volver (logout y regresa a login)
         Button(
-            onClick = { this@MainMenuScreen.navigate(Routes.Login.route) },
+            onClick = {
+                authViewModel.logout()
+                navController.navigate(Routes.Login.route) {
+                    popUpTo(Routes.Menu.route) { inclusive = true }
+                }
+            },
             colors = ButtonDefaults.buttonColors(containerColor = cardColor),
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier
