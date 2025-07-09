@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TempleHindu
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
+import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerViewModel
 
 
 @Composable
@@ -168,16 +171,26 @@ fun FilterScreen(
 
                 Spacer(Modifier.height(16.dp))
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    ActionButton(text = "CANCELAR") {
-                        navController.popBackStack()
+                    Button(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                    ) {
+                        Text("CANCELAR", color = Color.Black, fontWeight = FontWeight.Bold)
                     }
-                    ActionButton(text = "BUSCAR") {
-                        navController.navigate(Routes.ReservationManagement.route)
+
+                    Button(
+                        onClick = { WorkerViewModel.createWorker() },
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                    ) {
+                        Text("AÑADIR", color = Color.Black, fontWeight = FontWeight.Bold)
                     }
                 }
+
             }
         }
 
