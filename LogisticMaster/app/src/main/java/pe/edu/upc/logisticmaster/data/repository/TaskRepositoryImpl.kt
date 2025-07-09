@@ -2,8 +2,6 @@ package pe.edu.upc.logisticmaster.data.repository
 
 import pe.edu.upc.logisticmaster.domain.model.Task
 import pe.edu.upc.logisticmaster.data.remote.api.TaskApiService
-import pe.edu.upc.logisticmaster.data.remote.dto.TaskDto
-import kotlin.collections.map
 
 class TaskRepositoryImpl(
     private val api: TaskApiService
@@ -11,6 +9,10 @@ class TaskRepositoryImpl(
 
     override suspend fun getAllTasks(): List<Task> =
         api.getAll().map { it.toDomain() }
+
+    override suspend fun getTasksByWorker(workerId: Long): List<Task> =
+        api.getByWorker(workerId).map { it.toDomain() }
+
 
     override suspend fun getTaskById(id: Long): Task =
         api.getById(id).toDomain()
@@ -26,17 +28,17 @@ class TaskRepositoryImpl(
     }
 
     // Mappers
-    private fun TaskDto.toDomain() = Task(
-        id = this.id,
-        titulo = this.titulo,
+    private fun pe.edu.upc.logisticmaster.data.remote.dto.TaskDto.toDomain() = Task(
+        id          = this.id ?: 0L,
+        titulo      = this.titulo,
         descripcion = this.descripcion,
-        workerId = this.workerId
+        workerId    = this.workerId
     )
 
-    private fun Task.toDto() = TaskDto(
-        id = this.id,
-        titulo = this.titulo,
+    private fun Task.toDto() = pe.edu.upc.logisticmaster.data.remote.dto.TaskDto(
+        id          = this.id,
+        titulo      = this.titulo,
         descripcion = this.descripcion,
-        workerId = this.workerId
+        workerId    = this.workerId
     )
 }
