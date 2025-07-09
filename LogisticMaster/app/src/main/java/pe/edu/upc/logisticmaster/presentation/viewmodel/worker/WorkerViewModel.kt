@@ -5,29 +5,20 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import pe.edu.upc.logisticmaster.domain.model.Worker
 import pe.edu.upc.logisticmaster.data.repository.WorkerRepository
 
-/**
- * ViewModel para CRUD de trabajadores.
- */
 class WorkerViewModel(
     private val repo: WorkerRepository
 ) : ViewModel() {
 
-    // Estado general de la UI (lista, loading, error, success)
     private val _uiState = MutableStateFlow<WorkerUiState>(WorkerUiState.Idle)
     val uiState: StateFlow<WorkerUiState> = _uiState
 
-    // Estado actual del formulario
-    private val _formState = MutableStateFlow(WorkerFormState())
-    val formState: StateFlow<WorkerFormState> = _formState
+    private val _form = MutableStateFlow(WorkerFormState())
+    val formState: StateFlow<WorkerFormState> = _form
 
-    init {
-        loadWorkers()
-    }
+    init { loadWorkers() }
 
-    /** Carga todos los trabajadores */
     fun loadWorkers() {
         viewModelScope.launch {
             _uiState.value = WorkerUiState.Loading
@@ -40,60 +31,60 @@ class WorkerViewModel(
         }
     }
 
-    /** Actualiza el estado del formulario de worker */
     fun updateForm(update: WorkerFormState.() -> WorkerFormState) {
-        _formState.value = _formState.value.update()
+        _form.value = _form.value.update()
     }
 
-    /** Crea un nuevo trabajador usando los datos del formulario */
     fun createWorker() {
-        val form = _formState.value
-        if (!form.isValid) {
+        val f = _form.value
+        if (!f.isValid) {
             _uiState.value = WorkerUiState.Error("Completa todos los campos")
             return
         }
         viewModelScope.launch {
             _uiState.value = WorkerUiState.Loading
             try {
-                val newWorker = Worker(
-                    id = null,
-                    nombre   = form.nombre,
-                    apellido = form.apellido,
-                    email    = form.email,
-                    telefono = form.telefono,
-                    puesto   = form.puesto,
-                    area     = form.area
+                repo.createWorker(
+                    pe.edu.upc.logisticmaster.domain.model.Worker(
+                        id       = null,
+                        nombre   = f.nombre,
+                        apellido = f.apellido,
+                        email    = f.email,
+                        telefono = f.telefono,
+                        puesto   = f.puesto,
+                        area     = f.area
+                    )
                 )
-                repo.createWorker(newWorker)
                 _uiState.value = WorkerUiState.Success("Empleado creado")
                 loadWorkers()
-                _formState.value = WorkerFormState()
+                _form.value = WorkerFormState()
             } catch (e: Exception) {
                 _uiState.value = WorkerUiState.Error(e.message.orEmpty())
             }
         }
     }
 
-    /** Actualiza un trabajador existente */
     fun updateWorker(id: Long) {
-        val form = _formState.value
-        if (!form.isValid) {
+        val f = _form.value
+        if (!f.isValid) {
             _uiState.value = WorkerUiState.Error("Completa todos los campos")
             return
         }
         viewModelScope.launch {
             _uiState.value = WorkerUiState.Loading
             try {
-                val updated = Worker(
-                    id       = id,
-                    nombre   = form.nombre,
-                    apellido = form.apellido,
-                    email    = form.email,
-                    telefono = form.telefono,
-                    puesto   = form.puesto,
-                    area     = form.area
+                repo.updateWorker(
+                    id,
+                    pe.edu.upc.logisticmaster.domain.model.Worker(
+                        id       = id,
+                        nombre   = f.nombre,
+                        apellido = f.apellido,
+                        email    = f.email,
+                        telefono = f.telefono,
+                        puesto   = f.puesto,
+                        area     = f.area
+                    )
                 )
-                repo.updateWorker(id, updated)
                 _uiState.value = WorkerUiState.Success("Empleado actualizado")
                 loadWorkers()
             } catch (e: Exception) {
@@ -102,7 +93,6 @@ class WorkerViewModel(
         }
     }
 
-    /** Elimina un trabajador por su ID */
     fun deleteWorker(id: Long) {
         viewModelScope.launch {
             _uiState.value = WorkerUiState.Loading
