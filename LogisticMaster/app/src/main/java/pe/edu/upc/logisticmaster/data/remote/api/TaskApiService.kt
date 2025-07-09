@@ -10,6 +10,9 @@ interface TaskApiService {
     @GET("/api/tasks/{id}")
     suspend fun getById(@Path("id") id: Long): TaskDto
 
+    @GET("/api/tasks/worker/{workerId}")
+    suspend fun getByWorker(@Path("workerId") workerId: Long): List<TaskDto>
+
     @POST("/api/tasks")
     suspend fun create(@Body body: TaskDto): TaskDto
 
