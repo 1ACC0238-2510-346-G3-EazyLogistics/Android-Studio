@@ -1,5 +1,6 @@
 package pe.edu.upc.logisticmaster.presentation.view
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,12 +20,17 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,206 +43,209 @@ import androidx.navigation.NavController
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveUiState
+import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveViewModel
 
-
-
-data class Reserva(val nombre: String, val numero: String, val habitacion: String, val fecha: String, val estado: String)
 
 @Composable
-fun GestionReservasScreen(navController: NavController) {
+fun GestionReservasScreen(
+    navController: NavController,
+    reserveViewModel: ReserveViewModel
+) {
     val backgroundColor = Color(0xFF10BEAE)
-    val cardColor = Color(0xFFFFFFFF)
-    val textColor = Color(0xFF000000)
-    val accentColor = Color(0xFF10BEAE)
+    val cardColor       = Color.White
+    val accentColor     = Color(0xFF10BEAE)
+    val textColor       = Color.Black
 
-    val reservas = remember {
-        mutableStateListOf(
-            Reserva("Diego Bertie", "001", "101", "10.55", "Libre"),
-            Reserva("Tony Stark", "002", "102", "09:30", "Ocupada"),
-            Reserva("Alex Broca", "003", "103", "19:45", "Libre")
-        )
+    // Buscar texto
+    var query by remember { mutableStateOf("") }
+
+    // Carga inicial de reservas
+    LaunchedEffect(Unit) {
+        reserveViewModel.loadReserves()
     }
 
-    Box(
+    // Observa el estado UI
+    val uiState by reserveViewModel.uiState.collectAsState(initial = ReserveUiState.Idle)
+    val reservas = when (uiState) {
+        is ReserveUiState.Loaded  -> (uiState as ReserveUiState.Loaded).list
+        else                      -> emptyList()
+    }
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(24.dp)
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 70.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        // Título
+        Card(
+            colors = CardDefaults.cardColors(containerColor = cardColor),
+            shape  = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Card(
-                colors = CardDefaults.cardColors(containerColor = cardColor),
-                modifier = Modifier.fillMaxSize()
+            Text(
+                text      = "Administración de reservas",
+                fontSize  = 24.sp,
+                fontWeight= FontWeight.Bold,
+                color     = textColor,
+                modifier  = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Barra de búsqueda y filtros
+        Card(
+            colors = CardDefaults.cardColors(containerColor = accentColor),
+            shape  = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment   = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    placeholder = { Text("Buscar huéspedes...") },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor   = Color.White,
+                        unfocusedContainerColor = Color.White
+                    ),
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(Modifier.width(8.dp))
+                Button(
+                    onClick = { /* desplegar filtros */ },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = cardColor)
                 ) {
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Text(
-                        text = "Administración de reservas",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = textColor,
-                        modifier = Modifier.padding(8.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Filtros y búsqueda con fondo turquesa
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = accentColor),
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    "BUSCAR RESERVAS",
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                                TextButton(onClick = {
-                                    navController.navigate(Routes.Filters.route)
-                                }) {
-                                    Text("FILTROS", fontWeight = FontWeight.Bold, color = Color.White)
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            TextField(
-                                value = "",
-                                onValueChange = {},
-                                placeholder = { Text("Escriba aquí...") },
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color(0xFFE0F7FA),
-                                    unfocusedContainerColor = Color(0xFFE0F7FA),
-                                    focusedTextColor = textColor,
-                                    unfocusedTextColor = textColor
-                                ),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Botones
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = cardColor),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                "Lista de Reservas:",
-                                fontWeight = FontWeight.Bold,
-                                color = textColor
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            FlowRow(
-                                modifier = Modifier.fillMaxWidth(),
-                                mainAxisSpacing = 8.dp,
-                                crossAxisSpacing = 8.dp,
-                                mainAxisAlignment = FlowMainAxisAlignment.Center
-                            ) {
-                                Button(
-                                    onClick = { /* acción AGREGAR */ },
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = ButtonDefaults.buttonColors(containerColor = accentColor),
-                                    modifier = Modifier
-                                        .height(48.dp)
-                                        .defaultMinSize(minWidth = 120.dp)
-                                ) {
-                                    Text("AGREGAR", color = Color.White, fontSize = 14.sp)
-                                }
-
-                                Button(
-                                    onClick = {
-                                        navController.navigate(Routes.ReservationDetail.route)
-                                    },
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = ButtonDefaults.buttonColors(containerColor = accentColor),
-                                    modifier = Modifier
-                                        .height(48.dp)
-                                        .defaultMinSize(minWidth = 120.dp)
-                                ) {
-                                    Text("MODIFICAR", color = Color.White, fontSize = 14.sp)
-                                }
-
-                                Button(
-                                    onClick = { /* acción ELIMINAR */ },
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = ButtonDefaults.buttonColors(containerColor = accentColor),
-                                    modifier = Modifier
-                                        .height(48.dp)
-                                        .defaultMinSize(minWidth = 120.dp)
-                                ) {
-                                    Text("ELIMINAR", color = Color.White, fontSize = 14.sp)
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Lista de reservas con fondo turquesa
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        items(reservas) { reserva ->
-                            Card(
-                                colors = CardDefaults.cardColors(containerColor = accentColor),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text("Nombre del huesped: ${reserva.nombre}", color = Color.White)
-                                    Text("N° de Habitacion: ${reserva.numero}", color = Color.White)
-                                    Text("Hora de ingreso: ${reserva.fecha}", color = Color.White)
-                                    Text("Estado de Habitacion: ${reserva.estado}", color = Color.White)
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Filtros", color = accentColor)
                 }
             }
         }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Botones de acción
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(
+                onClick = {
+                    // navegar a detalle en modo “crear” (id = null)
+                    navController.navigate(Routes.ReservationDetail.route.replace("{id}", "new"))
+                },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = accentColor),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Agregar", color = Color.White)
+            }
+            Button(
+                onClick = {
+                    // aquí quizás abrir detalle del elemento seleccionado
+                },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = accentColor),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Modificar", color = Color.White)
+            }
+            Button(
+                onClick = {
+                    // borrar todas o la seleccionada
+                },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = accentColor),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Eliminar", color = Color.White)
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Lista filtrada
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            items(reservas.filter { it.nombreHuespedes.contains(query, ignoreCase = true) }) { reserve ->
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = accentColor),
+                    shape  = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                        .clickable {
+                            navController.navigate(
+                                Routes.ReservationDetail.route.replace("{id}", reserve.id.toString())
+                            )
+                        }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text(reserve.nombreHuespedes, color = Color.White, fontWeight = FontWeight.Bold)
+                            Text("Hab.: ${reserve.habitacion}", color = Color.White)
+                        }
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(reserve.horaIngreso, color = Color.White)
+                            Text(reserve.horaSalida, color = Color.White)
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        // Ver informe
+        Button(
+            onClick = { navController.navigate(Routes.Reports.route) },
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = cardColor),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+        ) {
+            Text("Ver Informe", color = accentColor)
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Volver
         Button(
             onClick = {
                 navController.navigate(Routes.Menu.route) {
                     popUpTo(Routes.ReservationManagement.route) { inclusive = true }
                 }
             },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = cardColor),
             modifier = Modifier
-                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(48.dp)
         ) {
-            Text("VOLVER", color = Color.Black)
+            Text("Volver", color = accentColor)
         }
     }
 }
-
-
-
-
-

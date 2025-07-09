@@ -34,6 +34,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,326 +65,129 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import pe.edu.upc.logisticmaster.R
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
-import pe.edu.upc.logisticmaster.presentation.viewmodel.AppViewModel
+import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.AuthUiState
+import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.AuthViewModel
+import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.LoginUiModel
 
 @Composable
-fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
-    var email by remember { mutableStateOf("") }
+fun LoginScreen(
+    navController: NavController,
+    viewModel: AuthViewModel
+) {
+    val backgroundColor = Color(0xFF10BEAE)
+    var usuario by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val isDarkTheme by appViewModel.isDarkMode.collectAsState()
-    val scrollState = rememberScrollState()
+    var passwordVisible by remember { mutableStateOf(false) }
 
-    val backgroundColor = if (isDarkTheme)
-        Color(0xFF10BEAE)
-    else
-        Color(0xFF10BEAE)
+    val authState by viewModel.state.collectAsState()
 
-    val cardColor = if (isDarkTheme)
-        Color(0xFF10BEAE)
-    else
-        Color.White
-
-    val textColor = if (isDarkTheme)
-        Color.Black
-    else
-        Color(0xFF1E293B)
-
-    val secondaryTextColor = if (isDarkTheme)
-        Color.Black
-    else
-        Color.Black
-
-    val accentColor = Color(0xFF10BEAE)
-
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-
-
-
-            // Semi-transparent overlay for better text readability
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-
-
-
-            )
-        }
-
-        Column(
+        // Título
+        Text(
+            text = "Iniciar Sesión",
+            color = Color.Black,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Top section with enhanced branding
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(top = 48.dp)
-            ) {
-                // Enhanced app logo with animation-ready design
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    accentColor,
-                                    Color( 0xFF10BEAE),
-                                )
-                            )
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.logistics_logo),
-                        contentDescription = "Logo",
-                        modifier = Modifier.size(150.dp)
+                .background(Color.White, RoundedCornerShape(12.dp))
+                .padding(16.dp)
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        // Campo Usuario
+        OutlinedTextField(
+            value = usuario,
+            onValueChange = { usuario = it },
+            singleLine = true,
+            label = { Text("Usuario") },
+            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        // Campo Contraseña
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            singleLine = true,
+            label = { Text("Contraseña") },
+            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+            visualTransformation = if (passwordVisible)
+                VisualTransformation.None
+            else
+                PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = if (passwordVisible)
+                            Icons.Default.VisibilityOff
+                        else
+                            Icons.Default.Visibility,
+                        contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
                     )
                 }
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
 
-                Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
 
-                Text(
-                    text = "Logistic Master",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-
-                Text(
-                    text = "Potencieando la experiencia hotelera",
-                    fontSize = 16.sp,
-                    color = secondaryTextColor,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Medium
-                )
+        // Estado de carga / error
+        when (authState) {
+            is AuthUiState.Loading -> {
+                CircularProgressIndicator(color = Color.White)
+                Spacer(Modifier.height(12.dp))
             }
-
-            // Enhanced login form
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = cardColor
-                ),
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 12.dp
+            is AuthUiState.Error -> {
+                Text(
+                    text = (authState as AuthUiState.Error).message,
+                    color = Color.Red,
+                    modifier = Modifier.padding(8.dp)
                 )
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(28.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Welcome header with icon
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-
-
-                        Spacer(modifier = Modifier.width(19.dp))
-
-                        Column(modifier = Modifier.weight(2f)) {
-
-                            Text(
-                                text = "Inicia sesión ",
-                                fontSize = 20.sp,
-                                color = secondaryTextColor
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    // Enhanced email field
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = { Text("Correo electrónico") },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Email,
-                                contentDescription = null,
-                                tint = accentColor
-                            )
-                        },
-                        singleLine = true,
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = if (isDarkTheme) Color(0xFF2C2C2E) else Color.White,
-                            unfocusedContainerColor = if (isDarkTheme) Color(0xFF2C2C2E) else Color.White,
-                            focusedBorderColor = accentColor,
-                            unfocusedBorderColor = if (isDarkTheme) Color.LightGray else Color(
-                                0xFFBDBDBD
-                            ),
-                            focusedTextColor = textColor,
-
-                            )
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // Enhanced password field
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Contraseña") },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.RemoveRedEye,
-                                contentDescription = null,
-                                tint = accentColor
-                            )
-                        },
-
-
-                        singleLine = true,
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = if (isDarkTheme) Color(0xFF2C2C2E) else Color.White,
-                            unfocusedContainerColor = if (isDarkTheme) Color(0xFF2C2C2E) else Color.White,
-                            focusedBorderColor = accentColor,
-                            unfocusedBorderColor = if (isDarkTheme) Color.LightGray else Color(
-                                0xFFBDBDBD
-                            ),
-                            focusedTextColor = textColor,
-                            unfocusedTextColor = textColor,
-                            focusedLabelColor = accentColor,
-                            unfocusedLabelColor = secondaryTextColor
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Enhanced login button
-                    val isFormValid = email.isNotBlank() && password.isNotBlank()
-
-                    Button(
-                        onClick = {
-                            navController.navigate(Routes.Menu.route) {
-                                popUpTo(Routes.Login.route) { inclusive = true }
-                            }
-                            navController.currentBackStackEntry?.savedStateHandle?.set(
-                                "reset_terms",
-                                true
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isFormValid) accentColor else secondaryTextColor,
-                            contentColor = Color.White
-                        ),
-                        elevation = ButtonDefaults.buttonElevation(
-                            defaultElevation = if (isFormValid) 8.dp else 2.dp
-                        ),
-                        enabled = isFormValid
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Login,
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Iniciar Sesión",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Enhanced divider
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Divider(
-                            modifier = Modifier.weight(1f),
-                            color = secondaryTextColor.copy(alpha = 0.3f)
-                        )
-                        Card(
-                            shape = CircleShape,
-                            colors = CardDefaults.cardColors(
-                                containerColor = cardColor
-                            ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                        ) {
-                            Text(
-                                text = "O",
-                                color = secondaryTextColor,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                        Divider(
-                            modifier = Modifier.weight(1f),
-                            color = secondaryTextColor.copy(alpha = 0.3f)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Enhanced register button
-                    OutlinedButton(
-                        onClick = { navController.navigate(Routes.Register.route) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(2.dp, accentColor),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = accentColor
-                        )
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.PersonAdd,
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Crear una cuenta",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                }
+                Spacer(Modifier.height(12.dp))
             }
+            else -> Unit
         }
 
+        // Botón Login
+        Button(
+            onClick = {
+                viewModel.login(LoginUiModel(usuario, password))
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+        ) {
+            Text("LOGIN", fontWeight = FontWeight.Bold)
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        // Navegación a Registro
+        TextButton(onClick = { navController.navigate(Routes.Register.route) }) {
+            Text("¿No tienes una cuenta? Regístrate", color = Color.White)
+        }
     }
-
-
+}
