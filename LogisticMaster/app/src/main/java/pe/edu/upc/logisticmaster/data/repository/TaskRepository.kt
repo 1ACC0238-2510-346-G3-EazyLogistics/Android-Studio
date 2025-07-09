@@ -6,6 +6,7 @@ import pe.edu.upc.logisticmaster.data.remote.dto.TaskDto
 
 interface TaskRepository {
     suspend fun getAllTasks(): List<Task>
+    suspend fun getTasksByWorker(workerId: Long): List<Task>
     suspend fun getTaskById(id: Long): Task
     suspend fun createTask(task: Task): Task
     suspend fun updateTask(id: Long, task: Task): Task

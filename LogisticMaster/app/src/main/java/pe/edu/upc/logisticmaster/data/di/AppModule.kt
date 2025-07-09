@@ -1,13 +1,12 @@
 package pe.edu.upc.logisticmaster.data.di
 
-import android.content.Context
-import androidx.room.Room
-import pe.edu.upc.logisticmaster.data.local.dao.WorkerDao
-import pe.edu.upc.logisticmaster.data.local.db.AppDatabase
 import pe.edu.upc.logisticmaster.data.remote.api.AuthApiService
 import pe.edu.upc.logisticmaster.data.remote.api.WorkerApiService
-import pe.edu.upc.logisticmaster.data.repository.WorkerRepository
+import pe.edu.upc.logisticmaster.data.remote.api.TaskApiService
+import pe.edu.upc.logisticmaster.data.remote.api.ReserveApiService
 import pe.edu.upc.logisticmaster.data.repository.WorkerRepositoryImpl
+import pe.edu.upc.logisticmaster.data.repository.TaskRepositoryImpl
+import pe.edu.upc.logisticmaster.data.repository.ReserveRepositoryImpl
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -22,23 +21,13 @@ object AppModule {
         .build()
 
     /** API services */
-    val authApiService: AuthApiService = retrofit.create(AuthApiService::class.java)
-    val workerApiService: WorkerApiService = retrofit.create(WorkerApiService::class.java)
+    val authApiService    = retrofit.create(AuthApiService::class.java)
+    val workerApiService  = retrofit.create(WorkerApiService::class.java)
+    val taskApiService    = retrofit.create(TaskApiService::class.java)
+    val reserveApiService = retrofit.create(ReserveApiService::class.java)
 
-    /** Room database */
-    fun provideDatabase(context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "app_db")
-            .fallbackToDestructiveMigration()
-            .build()
-
-    /** DAO */
-    fun provideWorkerDao(db: AppDatabase): WorkerDao =
-        db.workerDao()
-
-    /** Repository */
-    fun provideWorkerRepository(
-        api: WorkerApiService,
-        dao: WorkerDao
-    ): WorkerRepository =
-        WorkerRepositoryImpl(api, dao)
+    /** Repositorios */
+    val workerRepository  = WorkerRepositoryImpl(workerApiService)
+    val taskRepository    = TaskRepositoryImpl(taskApiService)
+    val reserveRepository = ReserveRepositoryImpl(reserveApiService)
 }

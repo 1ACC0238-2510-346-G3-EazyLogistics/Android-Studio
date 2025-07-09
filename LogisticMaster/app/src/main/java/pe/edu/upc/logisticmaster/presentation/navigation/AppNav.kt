@@ -1,97 +1,62 @@
 package pe.edu.upc.logisticmaster.presentation.navigation
 
+import AddEmployeeScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import pe.edu.upc.logisticmaster.presentation.view.DetalleReservaScreen
-import pe.edu.upc.logisticmaster.presentation.view.FiltersScreen
-import pe.edu.upc.logisticmaster.presentation.view.GestionReservasScreen
-import pe.edu.upc.logisticmaster.presentation.view.LoginScreen
-import pe.edu.upc.logisticmaster.presentation.view.MainMenuScreen
-import pe.edu.upc.logisticmaster.presentation.view.ModificarEmpleadoScreen
-import pe.edu.upc.logisticmaster.presentation.view.PersonalManagmentScreen
-import pe.edu.upc.logisticmaster.presentation.view.RegisterScreen
-import pe.edu.upc.logisticmaster.presentation.view.ReportScreen
-import pe.edu.upc.logisticmaster.presentation.viewmodel.AppViewModel
-import pe.edu.upc.logisticmaster.presentation.viewmodel.UserViewModel
+import pe.edu.upc.logisticmaster.presentation.view.*
+import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.AuthViewModel
+import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerViewModel
+import pe.edu.upc.logisticmaster.presentation.viewmodel.task.TaskViewModel
+import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveViewModel
+
 
 @Composable
 fun AppNav(
     navController: NavHostController,
-    userViewModel: UserViewModel,
-    appViewModel: AppViewModel
+    authViewModel: AuthViewModel,
+    workerViewModel: WorkerViewModel,
+    taskViewModel: TaskViewModel,
+    reserveViewModel: ReserveViewModel
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = Routes.Login.route
-    ) {
-
-        // --- Auth ---
+    NavHost(navController, startDestination = Routes.Login.route) {
         composable(Routes.Login.route) {
-            LoginScreen(
-                navController = navController,
-                appViewModel  = appViewModel
-            )
+            LoginScreen(navController, authViewModel)
         }
         composable(Routes.Register.route) {
-            RegisterScreen(
-                navController = navController,
-                appViewModel  = appViewModel
-            )
+            RegisterScreen(navController, authViewModel)
         }
-
-        // --- Main menu ---
         composable(Routes.Menu.route) {
-            MainMenuScreen(
-                navController = navController,
-                appViewModel  = appViewModel
-            )
+            MainMenuScreen(navController, authViewModel)
         }
-
-        // --- Workers ---
         composable(Routes.PersonalManagement.route) {
             PersonalManagmentScreen(
                 navController    = navController,
-                userViewModel    = userViewModel,
-                appViewModel     = appViewModel
+                workerViewModel  = workerViewModel,
+                authViewModel    = authViewModel
             )
         }
         composable(Routes.AddEmployee.route) {
             AddEmployeeScreen(
-                navController    = navController,
-                userViewModel    = userViewModel
+                navController,
+                workerViewModel
             )
         }
         composable(Routes.ModificarEmpleado.route) {
-            ModificarEmpleadoScreen(
-                navController    = navController,
-                userViewModel    = userViewModel
-            )
+            ModificarEmpleadoScreen(navController)
         }
-
-        // --- Reservations ---
         composable(Routes.ReservationManagement.route) {
-            GestionReservasScreen(
-                navController    = navController,
-                appViewModel     = appViewModel
-            )
+            GestionReservasScreen(navController, reserveViewModel)
         }
         composable(Routes.ReservationDetail.route) {
-            DetalleReservaScreen(
-                navController    = navController,
-                appViewModel     = appViewModel
-            )
+            DetalleReservaScreen(navController)
         }
         composable(Routes.Filters.route) {
-            FiltersScreen(
-                navController    = navController
-            )
+            FilterScreen(navController)
         }
         composable(Routes.Reports.route) {
-            ReportScreen(
-                navController    = navController
-            )
+            ReportScreen(navController)
         }
     }
 }
