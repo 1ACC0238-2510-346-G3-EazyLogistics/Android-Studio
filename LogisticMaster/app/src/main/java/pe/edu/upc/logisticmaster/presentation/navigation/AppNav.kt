@@ -22,10 +22,10 @@ fun AppNav(
 ) {
     NavHost(navController, startDestination = Routes.Login.route) {
         composable(Routes.Login.route) {
-            LoginScreen(navController, authViewModel)
+            LoginView(navController, authViewModel)
         }
         composable(Routes.Register.route) {
-            RegisterScreen(navController, authViewModel)
+            RegisterView(navController, authViewModel)
         }
         composable(Routes.Menu.route) {
             MainMenuScreen(navController, authViewModel)
