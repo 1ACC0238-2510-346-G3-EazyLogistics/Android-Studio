@@ -9,6 +9,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,94 +26,74 @@ import androidx.compose.material.icons.filled.TempleHindu
 import androidx.navigation.NavHostController
 import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.AuthViewModel
 
-
 @Composable
 fun MainMenuScreen(
     navController: NavHostController,
     authViewModel: AuthViewModel
 ) {
-    val backgroundColor = Color(0xFF10BEAE)
-    val cardColor       = Color.White
-    val textColor       = Color.Black
+    val backgroundColor = Color.White
+    val buttonColor = Color(0xFF10BEAE)
+    val textColor = Color.Black
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+            .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
-        // Logo + App name
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Default.TempleHindu,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(72.dp)
-            )
-            Spacer(Modifier.height(12.dp))
-            Text(
-                text = "LogisticsMasters",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Text(
-                text = "Potenciando la experiencia hotelera",
-                fontSize = 14.sp,
-                color = Color.White
-            )
-        }
+        // Ícono de usuario en la parte superior derecha
+        Icon(
+            imageVector = Icons.Default.AccountCircle,
+            contentDescription = "Perfil",
+            tint = Color.Black,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .size(48.dp)
+        )
 
-        // Menú de opciones
+        // Cuerpo del menú centrado verticalmente
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(top = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Gestión de personal
-            Card(
-                colors = CardDefaults.cardColors(containerColor = cardColor),
-                shape = RoundedCornerShape(12.dp),
+            Button(
+                onClick = { /* Servicios */ },
+                colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+                shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { navController.navigate(Routes.PersonalManagement.route) }
+                    .width(220.dp)
+                    .height(48.dp)
             ) {
-                Text(
-                    text = "Gestión de personal",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = textColor,
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
+                Text("Servicios", color = textColor, fontWeight = FontWeight.Bold)
             }
 
-            // Administración de reservas
-            Card(
-                colors = CardDefaults.cardColors(containerColor = cardColor),
-                shape = RoundedCornerShape(12.dp),
+            Button(
+                onClick = { navController.navigate(Routes.PersonalManagement.route) },
+                colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+                shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { navController.navigate(Routes.ReservationManagement.route) }
+                    .width(220.dp)
+                    .height(48.dp)
             ) {
-                Text(
-                    text = "Administración de reservas",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = textColor,
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
+                Text("Gestion de personal", color = textColor, fontWeight = FontWeight.Bold)
+            }
+
+            Button(
+                onClick = { navController.navigate(Routes.ReservationManagement.route) },
+                colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                    .width(220.dp)
+                    .height(48.dp)
+            ) {
+                Text("Administracion de reservas", color = textColor, fontWeight = FontWeight.Bold)
             }
         }
 
-        // Botón Volver (logout y regresa a login)
+        // Botón Volver abajo centrado
         Button(
             onClick = {
                 authViewModel.logout()
@@ -120,11 +101,12 @@ fun MainMenuScreen(
                     popUpTo(Routes.Menu.route) { inclusive = true }
                 }
             },
-            colors = ButtonDefaults.buttonColors(containerColor = cardColor),
-            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+            shape = RoundedCornerShape(6.dp),
             modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
+                .align(Alignment.BottomCenter)
+                .width(100.dp)
+                .height(40.dp)
         ) {
             Text("Volver", color = textColor, fontWeight = FontWeight.Bold)
         }
