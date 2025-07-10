@@ -17,11 +17,14 @@ class AuthViewModel(
     private val _state = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val state: StateFlow<AuthUiState> = _state
 
-    fun login(usuario: String, contrasena: String) {
+    fun login(email: String, contrasena: String) {
         viewModelScope.launch {
             _state.value = AuthUiState.Loading
             try {
-                val dto = api.getByUsuario(usuario)
+                // 1) Traemos el usuario por email
+                val dto = api.getByEmail(email)
+
+                // 2) Comparamos la contraseña
                 if (dto.contrasena == contrasena) {
                     val user = Usuario(
                         id         = dto.id,
@@ -68,6 +71,26 @@ class AuthViewModel(
                 _state.value = AuthUiState.Success(user)
             } catch (e: Exception) {
                 _state.value = AuthUiState.Error(e.message.orEmpty())
+            }
+        }
+    }
+
+    fun searchByEmail(email: String) {
+        viewModelScope.launch {
+            _state.value = AuthUiState.Loading
+            try {
+                val dto = api.getByEmail(email)
+                val user = Usuario(
+                    id         = dto.id,
+                    nombre     = dto.nombre,
+                    apellido   = dto.apellido,
+                    usuario    = dto.usuario,
+                    email      = dto.email,
+                    contrasena = dto.contrasena
+                )
+                _state.value = AuthUiState.Success(user)
+            } catch (e: Exception) {
+                _state.value = AuthUiState.Error("Usuario no encontrado")
             }
         }
     }

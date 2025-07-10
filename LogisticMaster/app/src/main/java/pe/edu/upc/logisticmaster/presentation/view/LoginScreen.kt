@@ -30,7 +30,10 @@ import pe.edu.upc.logisticmaster.R
 
 
 @Composable
-fun LoginView(navController: NavController, viewModel: AuthViewModel) {
+fun LoginView(
+    navController: NavController,
+    viewModel: AuthViewModel
+) {
     val backgroundColor = Color.White
     val accentColor = Color(0xFF10BEAE)
 
@@ -38,6 +41,16 @@ fun LoginView(navController: NavController, viewModel: AuthViewModel) {
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     val authState by viewModel.state.collectAsState()
+
+    // Cuando el estado sea Success, navegamos a la pantalla de menú
+    if (authState is AuthUiState.Success) {
+        LaunchedEffect(Unit) {
+            navController.navigate(Routes.Menu.route) {
+                // Evita volver a Login
+                popUpTo(Routes.Login.route) { inclusive = true }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -47,7 +60,7 @@ fun LoginView(navController: NavController, viewModel: AuthViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Logo superior
+        // — Logo y título (igual que antes) —
         Image(
             painter = painterResource(id = R.drawable.iconologistics),
             contentDescription = "Logo",
@@ -55,8 +68,6 @@ fun LoginView(navController: NavController, viewModel: AuthViewModel) {
                 .size(100.dp)
                 .padding(bottom = 24.dp)
         )
-
-        // Título debajo del logo
         Text(
             text = "Logistics Master",
             fontSize = 28.sp,
@@ -65,9 +76,9 @@ fun LoginView(navController: NavController, viewModel: AuthViewModel) {
             modifier = Modifier.padding(bottom = 24.dp),
             textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
 
-        // Email
+        // — Email —
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -82,22 +93,28 @@ fun LoginView(navController: NavController, viewModel: AuthViewModel) {
             )
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
-        // Password
+        // — Contraseña —
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("CONTRASEÑA") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 val icon = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = icon, contentDescription = null, tint = accentColor)
+                IconButton(
+                    onClick = { passwordVisible = !passwordVisible }  // <-- aquí
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                        tint = accentColor
+                    )
                 }
             },
+            modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = accentColor,
                 unfocusedBorderColor = accentColor,
@@ -106,24 +123,25 @@ fun LoginView(navController: NavController, viewModel: AuthViewModel) {
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
 
-        // Estado
+        Spacer(Modifier.height(16.dp))
+
+        // — Indicadores de estado —
         when (authState) {
             is AuthUiState.Loading -> CircularProgressIndicator(color = accentColor)
-            is AuthUiState.Error -> Text(
+            is AuthUiState.Error   -> Text(
                 text = (authState as AuthUiState.Error).message,
                 color = Color.Red
             )
             else -> Unit
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
-        // Botón login
+        // — Botón único de LOGIN —
         Button(
             onClick = {
-                viewModel.login(usuario = email, contrasena = password)
+                viewModel.login(email = email.trim(), contrasena = password)
             },
             colors = ButtonDefaults.buttonColors(containerColor = accentColor),
             shape = RoundedCornerShape(8.dp),
@@ -134,26 +152,15 @@ fun LoginView(navController: NavController, viewModel: AuthViewModel) {
             Text("LOGIN", color = Color.Black, fontWeight = FontWeight.Bold)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
-        // Registro
+        // — Navegación a Registro —
         TextButton(onClick = { navController.navigate(Routes.Register.route) }) {
             Text("¿No tienes una cuenta?", color = Color.Black, fontWeight = FontWeight.SemiBold)
         }
 
-        // Registro botón
-        Button(
-            onClick = { navController.navigate(Routes.Register.route) },
-            colors = ButtonDefaults.buttonColors(containerColor = accentColor),
-            modifier = Modifier
-                .wrapContentWidth()
-                .padding(top = 4.dp)
-        ) {
-            Text("REGISTRARSE", fontWeight = FontWeight.Bold, color = Color.Black)
-        }
+        Spacer(Modifier.height(16.dp))
 
-        // ¿Olvidaste tu contraseña?
-        Spacer(modifier = Modifier.height(16.dp))
         Text("¿Olvidaste tu contraseña?", color = Color.Black, fontSize = 12.sp)
     }
 }

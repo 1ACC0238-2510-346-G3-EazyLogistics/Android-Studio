@@ -18,4 +18,9 @@ interface AuthApiService {
 
     @GET("/api/users/username/{usuario}")
     suspend fun getByUsuario(@Path("usuario") usuario: String): UsuarioDto
+
+    @GET("/api/users/email/{email}")
+    suspend fun getByEmail(
+        @Path("email") email: String
+    ): UsuarioDto
 }
