@@ -23,6 +23,7 @@ import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.AuthViewModel
 import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.RegisterUiModel
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextFieldDefaults
+import kotlinx.coroutines.delay
 
 @Composable
 fun RegisterView(
@@ -30,108 +31,152 @@ fun RegisterView(
     viewModel: AuthViewModel
 ) {
     val mainColor = Color(0xFF10BEAE)
+    val authState by viewModel.state.collectAsState()
 
+    // Para manejar Snackbar
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Variables de formulario
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var confirmVisible by remember { mutableStateOf(false) }
 
-    val authState by viewModel.state.collectAsState()
+    // Cuando el registro sea exitoso, mostramos snackbar y navegamos
+    LaunchedEffect(authState) {
+        if (authState is AuthUiState.Success) {
+            snackbarHostState.showSnackbar("Registro exitoso")
+            // Pequeña pausa para que el usuario vea el mensaje
+            delay(1000)
+            navController.navigate(Routes.Login.route) {
+                popUpTo(Routes.Register.route) { inclusive = true }
+            }
+        }
+    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Título
-        Text(
-            text = "REGISTRARSE",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { padding ->
+        Column(
             modifier = Modifier
-                .background(mainColor, RoundedCornerShape(8.dp))
-                .padding(horizontal = 24.dp, vertical = 8.dp)
-        )
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(24.dp)
+                .padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "REGISTRARSE",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                modifier = Modifier
+                    .background(mainColor, RoundedCornerShape(8.dp))
+                    .padding(horizontal = 24.dp, vertical = 8.dp)
+            )
 
-        Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
-        // Función para campos de texto personalizados
-        @Composable
-        fun customTextField(value: String, onChange: (String) -> Unit, label: String) {
+            // Helper para campos de texto
+            @Composable
+            fun CustomTextField(
+                value: String,
+                onValueChange: (String) -> Unit,
+                label: String
+            ) {
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    label = { Text(label.uppercase(), fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                )
+            }
+
+            CustomTextField(nombre, { nombre = it }, "Nombre")
+            CustomTextField(apellido, { apellido = it }, "Apellido")
+            CustomTextField(email, { email = it }, "Email")
+
+            Spacer(Modifier.height(8.dp))
+
+            // Contraseña
             OutlinedTextField(
-                value = value,
-                onValueChange = onChange,
-                label = { Text(label.uppercase(), fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("CONTRASEÑA", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                 singleLine = true,
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = null
+                        )
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
             )
-        }
 
-        customTextField(nombre, { nombre = it }, "Nombre")
-        customTextField(apellido, { apellido = it }, "Apellido")
-        customTextField(email, { email = it }, "Email")
+            // Confirmar contraseña con toggle
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = { Text("CONFIRMAR CONTRASEÑA", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                singleLine = true,
+                visualTransformation = if (confirmVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { confirmVisible = !confirmVisible }) {
+                        Icon(
+                            imageVector = if (confirmVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = null
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            )
 
-        // Campo contraseña
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("CONTRASEÑA", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
-            singleLine = true,
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                        contentDescription = null
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
+            Spacer(Modifier.height(20.dp))
 
-        customTextField(confirmPassword, { confirmPassword = it }, "Confirmar Contraseña")
-
-        Spacer(Modifier.height(20.dp))
-
-        when (authState) {
-            is AuthUiState.Error -> {
-                Text(
+            // Mostrar error o loading
+            when (authState) {
+                is AuthUiState.Error -> Text(
                     text = (authState as AuthUiState.Error).message,
                     color = Color.Red,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
+                is AuthUiState.Loading -> CircularProgressIndicator(color = mainColor)
+                else -> Unit
             }
-            is AuthUiState.Loading -> CircularProgressIndicator(color = mainColor)
-            else -> Unit
-        }
 
-        Button(
-            onClick = {
-                viewModel.register(
-                    RegisterUiModel(
-                        nombre = nombre,
-                        apellido = apellido,
-                        usuario = email,
-                        email = email,
-                        contrasena = password
+            // Botón Confirmar
+            Button(
+                onClick = {
+                    viewModel.register(
+                        RegisterUiModel(
+                            nombre = nombre,
+                            apellido = apellido,
+                            usuario = email,
+                            email = email,
+                            contrasena = password
+                        )
                     )
-                )
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = mainColor),
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Text("Confirmar", fontWeight = FontWeight.Bold, color = Color.Black)
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = mainColor),
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                Text("Confirmar", fontWeight = FontWeight.Bold, color = Color.Black)
+            }
         }
     }
 }
