@@ -6,5 +6,5 @@ data class UserDto(
     val email: String,
     val nombre: String,
     val apellido: String,
-    val password: String? = null
+    val password: String? = null //sera esto?
 ) 
