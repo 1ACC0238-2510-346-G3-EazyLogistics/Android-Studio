@@ -5,97 +5,69 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import pe.edu.upc.logisticmaster.data.remote.api.AuthApiService
-import pe.edu.upc.logisticmaster.data.remote.dto.LoginRequest
-import pe.edu.upc.logisticmaster.data.remote.dto.RegisterRequest
-import pe.edu.upc.logisticmaster.domain.model.Usuario
+import pe.edu.upc.logisticmaster.domain.repository.UserRepository
+import pe.edu.upc.logisticmaster.domain.model.User
 
 class AuthViewModel(
-    private val api: AuthApiService
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
-    val state: StateFlow<AuthUiState> = _state
+    private val _authState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
+    val authState: StateFlow<AuthUiState> = _authState
 
-    fun login(email: String, contrasena: String) {
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: StateFlow<User?> = _currentUser
+
+    fun register(username: String, nombre: String, apellido: String, email: String, password: String) {
+        if (username.isBlank() || nombre.isBlank() || apellido.isBlank() || email.isBlank() || password.isBlank()) {
+            _authState.value = AuthUiState.Error("Todos los campos son requeridos")
+            return
+        }
+
         viewModelScope.launch {
-            _state.value = AuthUiState.Loading
+            _authState.value = AuthUiState.Loading
             try {
-                // 1) Traemos el usuario por email
-                val dto = api.getByEmail(email)
-
-                // 2) Comparamos la contraseña
-                if (dto.contrasena == contrasena) {
-                    val user = Usuario(
-                        id         = dto.id,
-                        nombre     = dto.nombre,
-                        apellido   = dto.apellido,
-                        usuario    = dto.usuario,
-                        email      = dto.email,
-                        contrasena = dto.contrasena
-                    )
-                    _state.value = AuthUiState.Success(user)
-                } else {
-                    _state.value = AuthUiState.Error("Contraseña incorrecta")
-                }
+                val user = User(
+                    id = null,
+                    usuario = username,
+                    email = email,
+                    nombre = nombre,
+                    apellido = apellido,
+                    password = password
+                )
+                val registeredUser = userRepository.register(user)
+                _currentUser.value = registeredUser
+                _authState.value = AuthUiState.Success("Registro exitoso")
             } catch (e: Exception) {
-                _state.value = AuthUiState.Error("Usuario no encontrado")
+                _authState.value = AuthUiState.Error(e.message ?: "Error en el registro")
             }
         }
     }
 
-    fun register(model: RegisterUiModel) {
-        viewModelScope.launch {
-            _state.value = AuthUiState.Loading
-            try {
-                // Llamamos al endpoint de registro y recibimos el DTO
-                val dto = api.register(
-                    RegisterRequest(
-                        model.nombre,
-                        model.apellido,
-                        model.usuario,
-                        model.email,
-                        model.contrasena
-                    )
-                )
-                // Mapear DTO a dominio
-                val user = Usuario(
-                    id         = dto.id,
-                    nombre     = dto.nombre,
-                    apellido   = dto.apellido,
-                    usuario    = dto.usuario,
-                    email      = dto.email,
-                    contrasena = dto.contrasena
-                )
-                // Emitir Success con el usuario recién creado
-                _state.value = AuthUiState.Success(user)
-            } catch (e: Exception) {
-                _state.value = AuthUiState.Error(e.message.orEmpty())
-            }
+    fun login(username: String, password: String) {
+        if (username.isBlank() || password.isBlank()) {
+            _authState.value = AuthUiState.Error("Usuario y contraseña son requeridos")
+            return
         }
-    }
 
-    fun searchByEmail(email: String) {
         viewModelScope.launch {
-            _state.value = AuthUiState.Loading
+            _authState.value = AuthUiState.Loading
             try {
-                val dto = api.getByEmail(email)
-                val user = Usuario(
-                    id         = dto.id,
-                    nombre     = dto.nombre,
-                    apellido   = dto.apellido,
-                    usuario    = dto.usuario,
-                    email      = dto.email,
-                    contrasena = dto.contrasena
-                )
-                _state.value = AuthUiState.Success(user)
+                val user = userRepository.login(username)
+                _currentUser.value = user
+                _authState.value = AuthUiState.Success("Inicio de sesión exitoso")
             } catch (e: Exception) {
-                _state.value = AuthUiState.Error("Usuario no encontrado")
+                _authState.value = AuthUiState.Error("Credenciales inválidas")
             }
         }
     }
 
     fun logout() {
-        _state.value = AuthUiState.Idle
+        _currentUser.value = null
+        _authState.value = AuthUiState.Idle
+    }
+
+    fun clearError() {
+        _authState.value = AuthUiState.Idle
     }
 }

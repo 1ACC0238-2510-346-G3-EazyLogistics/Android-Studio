@@ -1,46 +1,37 @@
 // ReserveRepositoryImpl.kt
 package pe.edu.upc.logisticmaster.data.repository
 
+import pe.edu.upc.logisticmaster.domain.model.Reserve
+import pe.edu.upc.logisticmaster.domain.repository.ReserveRepository
 import pe.edu.upc.logisticmaster.data.remote.api.ReserveApiService
 import pe.edu.upc.logisticmaster.data.remote.dto.ReserveDto
-import pe.edu.upc.logisticmaster.domain.model.Reserve
 
 class ReserveRepositoryImpl(
     private val api: ReserveApiService
 ) : ReserveRepository {
 
-    override suspend fun getAllReserves(): List<Reserve> =
-        api.getAll().map { it.toDomain() }
-
-    override suspend fun getReserveById(id: Long): Reserve =
-        api.getById(id).toDomain()
-
-    override suspend fun createReserve(reserve: Reserve): Reserve =
-        api.create(reserve.toDto()).toDomain()
-
-    override suspend fun updateReserve(id: Long, reserve: Reserve): Reserve =
-        api.update(id, reserve.toDto()).toDomain()
-
-    override suspend fun deleteReserve(id: Long) {
-        api.delete(id)
+    override suspend fun getAllReserves(): List<Reserve> {
+        return api.getAll().map { it.toDomain() }
     }
+
+    override suspend fun getReserveById(id: Long): Reserve {
+        return api.getById(id).toDomain()
+    }
+
+
 
     // Mappers
     private fun ReserveDto.toDomain() = Reserve(
-        id               = this.id,
-        nombreHuespedes  = this.nombreHuespedes,
-        habitacion       = this.habitacion,
-        horaIngreso      = this.horaIngreso,
-        horaSalida       = this.horaSalida
+        id = this.id,
+        fechaEntrada = this.fechaEntrada,
+        fechaSalida = this.fechaSalida,
+        estado = this.estado,
+        numeroHabitacion = this.numeroHabitacion,
+        precio = this.precio,
+        userId = this.userId,
+        hotelId = this.hotelId
     )
 
-    private fun Reserve.toDto() = ReserveDto(
-        id               = this.id,
-        nombreHuespedes  = this.nombreHuespedes,
-        habitacion       = this.habitacion,
-        horaIngreso      = this.horaIngreso,
-        horaSalida       = this.horaSalida,
-        fechaCreacion    = null  // lo genera el backend
-    )
+
 }
 

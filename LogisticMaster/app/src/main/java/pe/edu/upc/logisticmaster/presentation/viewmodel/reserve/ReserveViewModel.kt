@@ -5,74 +5,40 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import pe.edu.upc.logisticmaster.data.repository.ReserveRepository
-import pe.edu.upc.logisticmaster.domain.model.Reserve
+import pe.edu.upc.logisticmaster.domain.repository.ReserveRepository
 
 class ReserveViewModel(
-    private val repo: ReserveRepository
+    private val reserveRepository: ReserveRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ReserveUiState>(ReserveUiState.Idle)
     val uiState: StateFlow<ReserveUiState> = _uiState
 
-    private val _form = MutableStateFlow(ReserveFormState())
-    val formState: StateFlow<ReserveFormState> = _form
-
-    init { loadReserves() }
-
-    fun loadReserves() {
+    fun loadAllReserves() {
         viewModelScope.launch {
             _uiState.value = ReserveUiState.Loading
             try {
-                val list = repo.getAllReserves()
-                _uiState.value = ReserveUiState.Loaded(list)
+                val reserves = reserveRepository.getAllReserves()
+                _uiState.value = ReserveUiState.Loaded(reserves)
             } catch (e: Exception) {
-                _uiState.value = ReserveUiState.Error(e.message.orEmpty())
+                _uiState.value = ReserveUiState.Error(e.message ?: "Error al cargar reservas")
             }
         }
     }
 
-    fun updateForm(update: ReserveFormState.() -> ReserveFormState) {
-        _form.value = _form.value.update()
-    }
-
-    fun createReserve() {
-        val f = _form.value
-        if (!f.isValid) {
-            _uiState.value = ReserveUiState.Error("Completa todos los campos")
-            return
-        }
+    fun loadReserveById(id: Long) {
         viewModelScope.launch {
             _uiState.value = ReserveUiState.Loading
             try {
-                repo.createReserve(
-                    Reserve(
-                        id               = null,
-                        nombreHuespedes  = f.nombreHuespedes,
-                        habitacion       = f.habitacion,
-                        horaIngreso      = f.horaIngreso,
-                        horaSalida       = f.horaSalida
-                    )
-                )
-                _uiState.value = ReserveUiState.Success("Reserva creada")
-                loadReserves()
-                _form.value = ReserveFormState()
+                val reserve = reserveRepository.getReserveById(id)
+                _uiState.value = ReserveUiState.LoadedSingle(reserve)
             } catch (e: Exception) {
-                _uiState.value = ReserveUiState.Error(e.message.orEmpty())
+                _uiState.value = ReserveUiState.Error(e.message ?: "Error al cargar reserva")
             }
         }
     }
 
-    fun deleteReserve(id: Long) {
-        viewModelScope.launch {
-            _uiState.value = ReserveUiState.Loading
-            try {
-                repo.deleteReserve(id)
-                _uiState.value = ReserveUiState.Success("Reserva eliminada")
-                loadReserves()
-            } catch (e: Exception) {
-                _uiState.value = ReserveUiState.Error(e.message.orEmpty())
-            }
-        }
+    fun clearError() {
+        _uiState.value = ReserveUiState.Idle
     }
 }

@@ -2,175 +2,173 @@ package pe.edu.upc.logisticmaster.presentation.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TempleHindu
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import pe.edu.upc.logisticmaster.presentation.navigation.Routes
-import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveFormState
-import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveUiState
+import pe.edu.upc.logisticmaster.domain.model.Reserve
 import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveViewModel
+import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveUiState
+import pe.edu.upc.logisticmaster.presentation.view.MenuButton
 
 @Composable
 fun DetalleReservaScreen(
     navController: NavController,
+    reserveId: Long,
     reserveViewModel: ReserveViewModel
 ) {
     val backgroundColor = Color(0xFF10BEAE)
-    val fieldColor      = Color.White
-    val accentColor     = Color(0xFF10BEAE)
-    val textColor       = Color.Black
+    val cardColor = Color.White
 
-    // Initialize form (either blank for "new" or loaded)
-    LaunchedEffect(Unit) {
-        reserveViewModel.updateForm { ReserveFormState() }
+    val reserveUiState by reserveViewModel.uiState.collectAsState()
+
+    LaunchedEffect(reserveId) {
+        reserveViewModel.loadReserveById(reserveId)
     }
-
-    val form by reserveViewModel.formState.collectAsState()
-    val uiState by reserveViewModel.uiState.collectAsState(initial = ReserveUiState.Idle)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = "Detalle de reserva",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = textColor,
-            modifier = Modifier
-                .background(fieldColor, RoundedCornerShape(12.dp))
-                .padding(vertical = 8.dp, horizontal = 16.dp)
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = fieldColor),
-            elevation = CardDefaults.cardElevation(6.dp)
-        ) {
-            Column(Modifier.padding(16.dp)) {
-                OutlinedTextField(
-                    value = form.nombreHuespedes,
-                    onValueChange = { reserveViewModel.updateForm { copy(nombreHuespedes = it) } },
-                    label = { Text("Nombre huéspedes") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = accentColor,
-                        unfocusedContainerColor = accentColor
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(12.dp))
-                OutlinedTextField(
-                    value = form.habitacion,
-                    onValueChange = { reserveViewModel.updateForm { copy(habitacion = it) } },
-                    label = { Text("Habitación") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = accentColor,
-                        unfocusedContainerColor = accentColor
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(12.dp))
-                OutlinedTextField(
-                    value = form.horaIngreso,
-                    onValueChange = { reserveViewModel.updateForm { copy(horaIngreso = it) } },
-                    label = { Text("Hora ingreso") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = accentColor,
-                        unfocusedContainerColor = accentColor
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(12.dp))
-                OutlinedTextField(
-                    value = form.horaSalida,
-                    onValueChange = { reserveViewModel.updateForm { copy(horaSalida = it) } },
-                    label = { Text("Hora salida") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = accentColor,
-                        unfocusedContainerColor = accentColor
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        when (uiState) {
-            is ReserveUiState.Loading -> CircularProgressIndicator(color = Color.White)
-            is ReserveUiState.Error   -> Text(
-                text = (uiState as ReserveUiState.Error).message,
-                color = Color.Red,
-                modifier = Modifier.padding(8.dp)
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Detalle de\nReserva",
+                textAlign = TextAlign.Center,
+                color = Color.Black,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 24.dp, vertical = 8.dp)
             )
-            else -> { /* no-op */ }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Error/Success message
+            when (reserveUiState) {
+                is ReserveUiState.Error -> {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = (reserveUiState as ReserveUiState.Error).message,
+                            color = Color.Red,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                else -> {}
+            }
+
+            // Loading indicator
+            if (reserveUiState is ReserveUiState.Loading) {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier.padding(16.dp)
+                )
+            } else {
+                // Reserve Details
+                when (reserveUiState) {
+                    is ReserveUiState.LoadedSingle -> {
+                        val reserve = (reserveUiState as ReserveUiState.LoadedSingle).reserve
+                        ReserveDetailCard(reserve = reserve)
+                    }
+                    else -> {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = cardColor),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Text(
+                                "No se encontró la reserva",
+                                color = Color.Gray,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            MenuButton("VOLVER") {
+                navController.popBackStack()
+            }
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Button(
-                onClick = {
-                    // Llama a createReserve en lugar de submitReserve()
-                    reserveViewModel.createReserve()
-                    navController.popBackStack()
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-            ) {
-                Text("ACEPTAR", color = Color.Black, fontWeight = FontWeight.Bold)
-            }
-            Button(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-            ) {
-                Text("CANCELAR", color = Color.Black, fontWeight = FontWeight.Bold)
-            }
+        // Footer
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.TempleHindu,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(48.dp)
+            )
+            Text("LogisticsMasters", color = Color.White, fontWeight = FontWeight.Bold)
+            Text("Potenciando la experiencia hotelera", color = Color.White, fontSize = 12.sp)
         }
-
-        Spacer(Modifier.height(24.dp))
-
-        Icon(
-            imageVector = Icons.Default.TempleHindu,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(48.dp)
-        )
-        Text("LogisticsMasters", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
+
+@Composable
+fun ReserveDetailCard(reserve: Reserve) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            DetailRow("ID de Reserva:", reserve.id.toString())
+            DetailRow("Fecha de Entrada:", reserve.fechaEntrada)
+            DetailRow("Fecha de Salida:", reserve.fechaSalida)
+            DetailRow("Estado:", reserve.estado)
+            DetailRow("Número de Habitación:", reserve.numeroHabitacion.toString())
+            DetailRow("Precio:", "$${reserve.precio}")
+            DetailRow("ID de Usuario:", reserve.userId.toString())
+            DetailRow("ID de Hotel:", reserve.hotelId.toString())
+        }
+    }
+}
+
+@Composable
+fun DetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+        Text(
+            text = value,
+            color = Color.Black
+        )
+    }
+} 

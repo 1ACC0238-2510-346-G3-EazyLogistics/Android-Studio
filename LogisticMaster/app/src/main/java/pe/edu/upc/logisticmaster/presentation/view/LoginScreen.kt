@@ -1,52 +1,46 @@
 package pe.edu.upc.logisticmaster.presentation.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.TempleHindu
 import androidx.compose.material3.*
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
-import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.AuthUiState
 import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.AuthViewModel
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import pe.edu.upc.logisticmaster.R
-
+import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.AuthUiState
+import pe.edu.upc.logisticmaster.presentation.view.InputLabel
+import pe.edu.upc.logisticmaster.presentation.view.CustomInputField
+import pe.edu.upc.logisticmaster.presentation.view.ActionButton
 
 @Composable
-fun LoginView(
+fun LoginScreen(
     navController: NavController,
-    viewModel: AuthViewModel
+    authViewModel: AuthViewModel
 ) {
-    val backgroundColor = Color.White
-    val accentColor = Color(0xFF10BEAE)
+    val backgroundColor = Color(0xFF10BEAE)
+    val fieldColor = Color.White
 
-    var email by remember { mutableStateOf("") }
+    val authState by authViewModel.authState.collectAsState()
+    val currentUser by authViewModel.currentUser.collectAsState()
+
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    val authState by viewModel.state.collectAsState()
 
-    // Cuando el estado sea Success, navegamos a la pantalla de menú
-    if (authState is AuthUiState.Success) {
-        LaunchedEffect(Unit) {
+    // Navigate to menu if user is logged in
+    LaunchedEffect(currentUser) {
+        if (currentUser != null) {
             navController.navigate(Routes.Menu.route) {
-                // Evita volver a Login
                 popUpTo(Routes.Login.route) { inclusive = true }
             }
         }
@@ -58,109 +52,120 @@ fun LoginView(
             .background(backgroundColor)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // — Logo y título (igual que antes) —
-        Image(
-            painter = painterResource(id = R.drawable.iconologistics),
-            contentDescription = "Logo",
-            modifier = Modifier
-                .size(100.dp)
-                .padding(bottom = 24.dp)
-        )
-        Text(
-            text = "Logistics Master",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            modifier = Modifier.padding(bottom = 24.dp),
-            textAlign = TextAlign.Center
-        )
-        Spacer(Modifier.height(24.dp))
-
-        // — Email —
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("EMAIL") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = accentColor,
-                unfocusedBorderColor = accentColor,
-                focusedLabelColor = accentColor,
-                unfocusedLabelColor = accentColor
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Iniciar\nsesión",
+                textAlign = TextAlign.Center,
+                color = Color.Black,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 24.dp, vertical = 8.dp)
             )
-        )
 
-        Spacer(Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        // — Contraseña —
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("CONTRASEÑA") },
-            singleLine = true,
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                val icon = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
-                IconButton(
-                    onClick = { passwordVisible = !passwordVisible }  // <-- aquí
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña",
-                        tint = accentColor
+            // Error/Success message
+            when (authState) {
+                is AuthUiState.Error -> {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = (authState as AuthUiState.Error).message,
+                            color = Color.Red,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                is AuthUiState.Success -> {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.Green.copy(alpha = 0.1f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = (authState as AuthUiState.Success).message,
+                            color = Color.Green,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                else -> {}
+            }
+
+            // Formulario
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = fieldColor),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(6.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    InputLabel("USUARIO")
+                    CustomInputField(
+                        value = username,
+                        onValueChange = { username = it }
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    InputLabel("CONTRASEÑA")
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color(0xFF10BEAE),
+                            unfocusedContainerColor = Color(0xFF10BEAE),
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = PasswordVisualTransformation()
                     )
                 }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = accentColor,
-                unfocusedBorderColor = accentColor,
-                focusedLabelColor = accentColor,
-                unfocusedLabelColor = accentColor
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Botones
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                ActionButton(
+                    text = "INICIAR SESIÓN",
+                    onClick = { authViewModel.login(username, password) }
+                )
+
+                ActionButton(
+                    text = "REGISTRARSE",
+                    onClick = { navController.navigate(Routes.Register.route) }
+                )
+            }
+        }
+
+        // Logo pie de página
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.TempleHindu,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(48.dp)
             )
-        )
-
-
-        Spacer(Modifier.height(16.dp))
-
-        // — Indicadores de estado —
-        when (authState) {
-            is AuthUiState.Loading -> CircularProgressIndicator(color = accentColor)
-            is AuthUiState.Error   -> Text(
-                text = (authState as AuthUiState.Error).message,
-                color = Color.Red
-            )
-            else -> Unit
+            Text("LogisticsMasters", color = Color.White, fontWeight = FontWeight.Bold)
+            Text("Potenciando la experiencia hotelera", color = Color.White, fontSize = 12.sp)
         }
-
-        Spacer(Modifier.height(16.dp))
-
-        // — Botón único de LOGIN —
-        Button(
-            onClick = {
-                viewModel.login(email = email.trim(), contrasena = password)
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = accentColor),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-        ) {
-            Text("LOGIN", color = Color.Black, fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        // — Navegación a Registro —
-        TextButton(onClick = { navController.navigate(Routes.Register.route) }) {
-            Text("¿No tienes una cuenta?", color = Color.Black, fontWeight = FontWeight.SemiBold)
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Text("¿Olvidaste tu contraseña?", color = Color.Black, fontSize = 12.sp)
     }
 }
+
+

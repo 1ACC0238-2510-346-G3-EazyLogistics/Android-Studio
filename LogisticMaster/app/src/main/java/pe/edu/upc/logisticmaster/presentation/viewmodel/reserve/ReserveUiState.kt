@@ -8,7 +8,7 @@ import pe.edu.upc.logisticmaster.domain.model.Reserve
 sealed class ReserveUiState {
     object Idle : ReserveUiState()                     // sin acción
     object Loading : ReserveUiState()                  // cargando
-    data class Loaded(val list: List<Reserve>) : ReserveUiState()  // lista de reservas cargada
-    data class Success(val message: String) : ReserveUiState()     // operación OK
+    data class Loaded(val reserves: List<Reserve>) : ReserveUiState()  // lista de reservas cargada
+    data class LoadedSingle(val reserve: Reserve) : ReserveUiState()  // reserva individual cargada
     data class Error(val message: String) : ReserveUiState()       // ocurrió un error
 }

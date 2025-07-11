@@ -15,10 +15,10 @@ interface WorkerApiService {
     suspend fun getByWorker(@Path("workerId") workerId: Long): List<TaskDto>
 
     @POST("/api/workers")
-    suspend fun create(@Body body: WorkerDto): WorkerDto
+    suspend fun create(@Body worker: WorkerDto): WorkerDto
 
     @PUT("/api/workers/{id}")
-    suspend fun update(@Path("id") id: Long, @Body body: WorkerDto): WorkerDto
+    suspend fun update(@Path("id") id: Long, @Body worker: WorkerDto): WorkerDto
 
     @DELETE("/api/workers/{id}")
     suspend fun delete(@Path("id") id: Long)

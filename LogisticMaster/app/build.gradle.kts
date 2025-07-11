@@ -62,6 +62,7 @@ dependencies {
     implementation ("com.google.accompanist:accompanist-flowlayout:0.30.1")
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
+    implementation(libs.androidx.room.runtime.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

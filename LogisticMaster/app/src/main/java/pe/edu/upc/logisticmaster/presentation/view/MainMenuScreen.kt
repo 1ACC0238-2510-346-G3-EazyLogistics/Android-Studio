@@ -1,17 +1,12 @@
 package pe.edu.upc.logisticmaster.presentation.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.TempleHindu
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,94 +16,99 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.TempleHindu
-import androidx.navigation.NavHostController
 import pe.edu.upc.logisticmaster.presentation.viewmodel.auth.AuthViewModel
+import pe.edu.upc.logisticmaster.presentation.view.MenuButton
+import pe.edu.upc.logisticmaster.presentation.view.ActionButton
 
 @Composable
 fun MainMenuScreen(
-    navController: NavHostController,
+    navController: NavController,
     authViewModel: AuthViewModel
 ) {
-    val backgroundColor = Color.White
-    val buttonColor = Color(0xFF10BEAE)
-    val textColor = Color.Black
+    val backgroundColor = Color(0xFF10BEAE)
+    val currentUser by authViewModel.currentUser.collectAsState()
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(horizontal = 24.dp, vertical = 16.dp)
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Ícono de usuario en la parte superior derecha
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Perfil",
-            tint = Color.Black,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .size(48.dp)
-        )
-
-        // Cuerpo del menú centrado verticalmente
-        Column(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(top = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            Button(
-                onClick = { /* Servicios */ },
-                colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
-                shape = RoundedCornerShape(8.dp),
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Menú\nPrincipal",
+                textAlign = TextAlign.Center,
+                color = Color.Black,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .width(220.dp)
-                    .height(48.dp)
-            ) {
-                Text("Servicios", color = textColor, fontWeight = FontWeight.Bold)
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .padding(vertical = 8.dp, horizontal = 24.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Welcome message
+            currentUser?.let { user ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "Bienvenido, ${user.usuario}",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
-            Button(
-                onClick = { navController.navigate(Routes.PersonalManagement.route) },
-                colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier
-                    .width(220.dp)
-                    .height(48.dp)
+            // Menu Options
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Gestion de personal", color = textColor, fontWeight = FontWeight.Bold)
+                MenuButton("GESTIÓN DE PERSONAL") {
+                    navController.navigate(Routes.PersonalManagement.route)
+                }
+
+                MenuButton("GESTIÓN DE TAREAS") {
+                    navController.navigate(Routes.TaskManagement.route)
+                }
+
+                MenuButton("GESTIÓN DE RESERVAS") {
+                    navController.navigate(Routes.ReservationManagement.route)
+                }
             }
 
-            Button(
-                onClick = { navController.navigate(Routes.ReservationManagement.route) },
-                colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier
-                    .width(220.dp)
-                    .height(48.dp)
-            ) {
-                Text("Administracion de reservas", color = textColor, fontWeight = FontWeight.Bold)
-            }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Logout button
+            ActionButton(
+                text = "CERRAR SESIÓN",
+                onClick = {
+                    authViewModel.logout()
+                    navController.navigate(Routes.Login.route) {
+                        popUpTo(Routes.Menu.route) { inclusive = true }
+                    }
+                }
+            )
         }
 
-        // Botón Volver abajo centrado
-        Button(
-            onClick = {
-                authViewModel.logout()
-                navController.navigate(Routes.Login.route) {
-                    popUpTo(Routes.Menu.route) { inclusive = true }
-                }
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
-            shape = RoundedCornerShape(6.dp),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .width(100.dp)
-                .height(40.dp)
-        ) {
-            Text("Volver", color = textColor, fontWeight = FontWeight.Bold)
+        // Footer
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.TempleHindu,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(48.dp)
+            )
+            Text("LogisticsMasters", color = Color.White, fontWeight = FontWeight.Bold)
+            Text("Potenciando la experiencia hotelera", color = Color.White, fontSize = 12.sp)
         }
     }
 }

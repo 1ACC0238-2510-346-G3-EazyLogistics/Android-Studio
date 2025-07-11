@@ -17,23 +17,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import pe.edu.upc.logisticmaster.domain.model.Task
+import pe.edu.upc.logisticmaster.presentation.viewmodel.task.TaskViewModel
+import pe.edu.upc.logisticmaster.presentation.viewmodel.task.TaskUiState
 import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerViewModel
 import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerUiState
-import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerFormState
+import pe.edu.upc.logisticmaster.presentation.viewmodel.task.TaskFormState
 import pe.edu.upc.logisticmaster.presentation.view.InputLabel
 import pe.edu.upc.logisticmaster.presentation.view.CustomInputField
 import pe.edu.upc.logisticmaster.presentation.view.ActionButton
 
 @Composable
-fun ModificarEmpleadoScreen(
+fun EditTaskScreen(
     navController: NavController,
+    taskId: Long,
+    taskViewModel: TaskViewModel,
     workerViewModel: WorkerViewModel
 ) {
     val backgroundColor = Color(0xFF10BEAE)
     val fieldColor = Color.White
 
+    val taskUiState by taskViewModel.uiState.collectAsState()
     val workerUiState by workerViewModel.uiState.collectAsState()
-    val formState by workerViewModel.formState.collectAsState()
+    val formState by taskViewModel.formState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        workerViewModel.loadWorkers()
+        // TODO: Load task by ID and populate form
+    }
 
     Column(
         modifier = Modifier
@@ -46,7 +57,7 @@ fun ModificarEmpleadoScreen(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Modificar\nEmpleado",
+                text = "Editar\ntarea",
                 textAlign = TextAlign.Center,
                 color = Color.Black,
                 fontSize = 28.sp,
@@ -59,27 +70,27 @@ fun ModificarEmpleadoScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             // Error/Success message
-            when (workerUiState) {
-                is WorkerUiState.Error -> {
+            when (taskUiState) {
+                is TaskUiState.Error -> {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = (workerUiState as WorkerUiState.Error).message,
+                            text = (taskUiState as TaskUiState.Error).message,
                             color = Color.Red,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-                is WorkerUiState.Success -> {
+                is TaskUiState.Success -> {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color.Green.copy(alpha = 0.1f)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = (workerUiState as WorkerUiState.Success).message,
+                            text = (taskUiState as TaskUiState.Success).message,
                             color = Color.Green,
                             modifier = Modifier.padding(16.dp)
                         )
@@ -97,51 +108,66 @@ fun ModificarEmpleadoScreen(
                 elevation = CardDefaults.cardElevation(6.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    InputLabel("NOMBRE")
+                    InputLabel("TÍTULO DE LA TAREA")
                     CustomInputField(
-                        value = formState.nombre,
-                        onValueChange = { workerViewModel.updateNombre(it) }
+                        value = formState.titulo, 
+                        onValueChange = { taskViewModel.updateTitulo(it) }
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    InputLabel("APELLIDO")
+                    InputLabel("DESCRIPCIÓN")
                     CustomInputField(
-                        value = formState.apellido,
-                        onValueChange = { workerViewModel.updateApellido(it) }
+                        value = formState.descripcion,
+                        onValueChange = { taskViewModel.updateDescripcion(it) },
+                        singleLine = false
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    InputLabel("PUESTO")
-                    CustomInputField(
-                        value = formState.puesto,
-                        onValueChange = { workerViewModel.updatePuesto(it) }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    InputLabel("ÁREA")
-                    CustomInputField(
-                        value = formState.area,
-                        onValueChange = { workerViewModel.updateArea(it) }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    InputLabel("EMAIL")
-                    CustomInputField(
-                        value = formState.email,
-                        onValueChange = { workerViewModel.updateEmail(it) }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    InputLabel("TELÉFONO")
-                    CustomInputField(
-                        value = formState.telefono,
-                        onValueChange = { workerViewModel.updateTelefono(it) }
-                    )
+                    InputLabel("ASIGNAR A EMPLEADO")
+                    when (workerUiState) {
+                        is WorkerUiState.Loaded -> {
+                            val workers = (workerUiState as WorkerUiState.Loaded).list
+                            if (workers.isNotEmpty()) {
+                                workers.forEach { worker ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        RadioButton(
+                                            selected = formState.workerId == worker.id,
+                                            onClick = { taskViewModel.updateWorkerId(worker.id) }
+                                        )
+                                        Text(
+                                            text = "${worker.nombre} ${worker.apellido}",
+                                            modifier = Modifier.padding(start = 8.dp)
+                                        )
+                                    }
+                                }
+                            } else {
+                                Text(
+                                    text = "No hay empleados disponibles",
+                                    color = Color.Gray,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                        is WorkerUiState.Loading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                        else -> {
+                            Text(
+                                text = "No hay empleados disponibles",
+                                color = Color.Gray,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
                 }
             }
 
@@ -160,7 +186,7 @@ fun ModificarEmpleadoScreen(
                 ActionButton(
                     text = "ACTUALIZAR",
                     onClick = { 
-                        // TODO: Implement update worker functionality
+                        taskViewModel.updateTask(taskId)
                         navController.popBackStack()
                     },
                     modifier = Modifier.weight(1f)
@@ -180,4 +206,4 @@ fun ModificarEmpleadoScreen(
             Text("Potenciando la experiencia hotelera", color = Color.White, fontSize = 12.sp)
         }
     }
-}
+} 

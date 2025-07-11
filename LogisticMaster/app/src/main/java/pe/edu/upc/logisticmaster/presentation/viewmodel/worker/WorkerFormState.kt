@@ -6,18 +6,18 @@ package pe.edu.upc.logisticmaster.presentation.viewmodel.worker
 data class WorkerFormState(
     val nombre: String = "",
     val apellido: String = "",
-    val email: String = "",
-    val telefono: String = "",
     val puesto: String = "",
-    val area: String = ""
+    val area: String = "",
+    val email: String = "",
+    val telefono: String = ""
 ) {
     /** Sólo válido si todos los campos están completos */
     val isValid: Boolean
         get() =
             nombre.isNotBlank() &&
                     apellido.isNotBlank() &&
-                    email.isNotBlank() &&
-                    telefono.isNotBlank() &&
                     puesto.isNotBlank() &&
-                    area.isNotBlank()
+                    area.isNotBlank() &&
+                    email.isNotBlank() &&
+                    telefono.isNotBlank()
 }

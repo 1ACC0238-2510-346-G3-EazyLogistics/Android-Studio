@@ -1,37 +1,15 @@
 package pe.edu.upc.logisticmaster.presentation.view
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.TempleHindu
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,15 +18,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import pe.edu.upc.logisticmaster.domain.model.Reserve
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
-import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.flowlayout.FlowMainAxisAlignment
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveUiState
 import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveViewModel
-
+import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveUiState
+import pe.edu.upc.logisticmaster.presentation.view.MenuButton
 
 @Composable
 fun GestionReservasScreen(
@@ -56,196 +30,178 @@ fun GestionReservasScreen(
     reserveViewModel: ReserveViewModel
 ) {
     val backgroundColor = Color(0xFF10BEAE)
-    val cardColor       = Color.White
-    val accentColor     = Color(0xFF10BEAE)
-    val textColor       = Color.Black
+    val cardColor = Color(0xFFFFFFFF)
+    val textColor = Color(0xFF000000)
 
-    // Buscar texto
-    var query by remember { mutableStateOf("") }
+    val reserveUiState by reserveViewModel.uiState.collectAsState()
 
-    // Carga inicial de reservas
     LaunchedEffect(Unit) {
-        reserveViewModel.loadReserves()
-    }
-
-    // Observa el estado UI
-    val uiState by reserveViewModel.uiState.collectAsState(initial = ReserveUiState.Idle)
-    val reservas = when (uiState) {
-        is ReserveUiState.Loaded  -> (uiState as ReserveUiState.Loaded).list
-        else                      -> emptyList()
+        reserveViewModel.loadAllReserves()
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Título
-        Card(
-            colors = CardDefaults.cardColors(containerColor = cardColor),
-            shape  = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text      = "Administración de reservas",
-                fontSize  = 24.sp,
-                fontWeight= FontWeight.Bold,
-                color     = textColor,
-                modifier  = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        // Barra de búsqueda y filtros
-        Card(
-            colors = CardDefaults.cardColors(containerColor = accentColor),
-            shape  = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
+                text = "Gestión de\nReservas",
+                textAlign = TextAlign.Center,
+                color = textColor,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment   = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = { query = it },
-                    placeholder = { Text("Buscar huéspedes...") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor   = Color.White,
-                        unfocusedContainerColor = Color.White
-                    ),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(Modifier.width(8.dp))
-                Button(
-                    onClick = { /* desplegar filtros */ },
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = cardColor)
-                ) {
-                    Text("Filtros", color = accentColor)
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .padding(vertical = 8.dp, horizontal = 24.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Error message
+            when (reserveUiState) {
+                is ReserveUiState.Error -> {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = (reserveUiState as ReserveUiState.Error).message,
+                            color = Color.Red,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
+                else -> {}
             }
-        }
 
-        Spacer(Modifier.height(16.dp))
-
-        // Botones de acción
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Button(
-                onClick = {
-                    // navegar a detalle en modo “crear” (id = null)
-                    navController.navigate(Routes.ReservationDetail.route.replace("{id}", "new"))
-                },
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = accentColor),
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("Agregar", color = Color.White)
-            }
-            Button(
-                onClick = {
-                    // aquí quizás abrir detalle del elemento seleccionado
-                },
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = accentColor),
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("Modificar", color = Color.White)
-            }
-            Button(
-                onClick = {
-                    // borrar todas o la seleccionada
-                },
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = accentColor),
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("Eliminar", color = Color.White)
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        // Lista filtrada
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            items(reservas.filter { it.nombreHuespedes.contains(query, ignoreCase = true) }) { reserve ->
+            // Loading indicator
+            if (reserveUiState is ReserveUiState.Loading) {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier.padding(16.dp)
+                )
+            } else {
+                // Reserve List
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = accentColor),
-                    shape  = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .clickable {
-                            navController.navigate(
-                                Routes.ReservationDetail.route.replace("{id}", reserve.id.toString())
-                            )
-                        }
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = cardColor),
+                    elevation = CardDefaults.cardElevation(8.dp)
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .padding(12.dp)
                     ) {
-                        Column {
-                            Text(reserve.nombreHuespedes, color = Color.White, fontWeight = FontWeight.Bold)
-                            Text("Hab.: ${reserve.habitacion}", color = Color.White)
-                        }
-                        Column(horizontalAlignment = Alignment.End) {
-                            Text(reserve.horaIngreso, color = Color.White)
-                            Text(reserve.horaSalida, color = Color.White)
+                        Text(
+                            "Lista de Reservas:",
+                            fontWeight = FontWeight.Bold,
+                            color = textColor,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        when (reserveUiState) {
+                            is ReserveUiState.Loaded -> {
+                                val reserves = (reserveUiState as ReserveUiState.Loaded).reserves
+                                if (reserves.isEmpty()) {
+                                    Text(
+                                        "No hay reservas disponibles",
+                                        color = textColor.copy(alpha = 0.6f),
+                                        modifier = Modifier.padding(16.dp)
+                                    )
+                                } else {
+                                    LazyColumn(
+                                        modifier = Modifier.heightIn(max = 400.dp)
+                                    ) {
+                                        items(reserves) { reserve ->
+                                            ReserveItem(
+                                                reserve = reserve,
+                                                onClick = {
+                                                    navController.navigate("${Routes.ReservationDetail.route}/${reserve.id}")
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            else -> {
+                                Text(
+                                    "No hay reservas disponibles",
+                                    color = textColor.copy(alpha = 0.6f),
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
 
-        Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        // Ver informe
-        Button(
-            onClick = { navController.navigate(Routes.Reports.route) },
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = cardColor),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-        ) {
-            Text("Ver Informe", color = accentColor)
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        // Volver
-        Button(
-            onClick = {
+            MenuButton("Volver") {
                 navController.navigate(Routes.Menu.route) {
                     popUpTo(Routes.ReservationManagement.route) { inclusive = true }
                 }
-            },
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = cardColor),
+            }
+        }
+
+        // Footer
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.TempleHindu,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(48.dp)
+            )
+            Text("LogisticsMasters", color = Color.White, fontWeight = FontWeight.Bold)
+            Text("Potenciando la experiencia hotelera", color = Color.White, fontSize = 12.sp)
+        }
+    }
+}
+
+@Composable
+fun ReserveItem(
+    reserve: Reserve,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF10BEAE))
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
+                .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
-            Text("Volver", color = accentColor)
+            Text(
+                text = "Reserva #${reserve.id}",
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Habitación: ${reserve.numeroHabitacion}",
+                color = Color.White.copy(alpha = 0.8f),
+                fontSize = 12.sp
+            )
+            Text(
+                text = "Estado: ${reserve.estado}",
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 10.sp
+            )
+            Text(
+                text = "Precio: $${reserve.precio}",
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 10.sp
+            )
         }
     }
 }

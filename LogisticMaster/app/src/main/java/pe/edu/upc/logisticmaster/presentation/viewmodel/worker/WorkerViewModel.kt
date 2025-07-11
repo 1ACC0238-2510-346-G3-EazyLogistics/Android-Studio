@@ -5,90 +5,105 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import pe.edu.upc.logisticmaster.data.repository.WorkerRepository
+import pe.edu.upc.logisticmaster.domain.repository.WorkerRepository
+import pe.edu.upc.logisticmaster.domain.model.Worker
 
 class WorkerViewModel(
-    private val repo: WorkerRepository
+    private val workerRepository: WorkerRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WorkerUiState>(WorkerUiState.Idle)
     val uiState: StateFlow<WorkerUiState> = _uiState
 
-    private val _form = MutableStateFlow(WorkerFormState())
-    val formState: StateFlow<WorkerFormState> = _form
+    private val _formState = MutableStateFlow(WorkerFormState())
+    val formState: StateFlow<WorkerFormState> = _formState
 
-    init { loadWorkers() }
+
 
     fun loadWorkers() {
         viewModelScope.launch {
             _uiState.value = WorkerUiState.Loading
             try {
-                val list = repo.getAllWorkers()
-                _uiState.value = WorkerUiState.Loaded(list)
+                val workers = workerRepository.getAllWorkers()
+                _uiState.value = WorkerUiState.Loaded(workers)
             } catch (e: Exception) {
-                _uiState.value = WorkerUiState.Error(e.message.orEmpty())
+                _uiState.value = WorkerUiState.Error(e.message ?: "Error al cargar empleados")
             }
         }
     }
 
-    fun updateForm(update: WorkerFormState.() -> WorkerFormState) {
-        _form.value = _form.value.update()
-    }
-
-    fun createWorker() {
-        val f = _form.value
-        if (!f.isValid) {
-            _uiState.value = WorkerUiState.Error("Completa todos los campos")
-            return
-        }
+    fun loadWorkerById(id: Long) {
         viewModelScope.launch {
             _uiState.value = WorkerUiState.Loading
             try {
-                repo.createWorker(
-                    pe.edu.upc.logisticmaster.domain.model.Worker(
-                        id       = null,
-                        nombre   = f.nombre,
-                        apellido = f.apellido,
-                        email    = f.email,
-                        telefono = f.telefono,
-                        puesto   = f.puesto,
-                        area     = f.area
-                    )
+                val worker = workerRepository.getWorkerById(id)
+                _formState.value = WorkerFormState(
+                    nombre = worker.nombre,
+                    apellido = worker.apellido,
+                    puesto = worker.puesto,
+                    area = worker.area,
+                    email = worker.email,
+                    telefono = worker.telefono
                 )
-                _uiState.value = WorkerUiState.Success("Empleado creado")
-                loadWorkers()
-                _form.value = WorkerFormState()
+                _uiState.value = WorkerUiState.Loaded(listOf(worker))
             } catch (e: Exception) {
-                _uiState.value = WorkerUiState.Error(e.message.orEmpty())
+                _uiState.value = WorkerUiState.Error(e.message ?: "Error al cargar empleado")
+            }
+        }
+    }
+
+    fun createWorker() {
+        val form = _formState.value
+        if (form.nombre.isBlank() || form.apellido.isBlank() || form.puesto.isBlank() || form.area.isBlank() || form.email.isBlank() || form.telefono.isBlank()) {
+            _uiState.value = WorkerUiState.Error("Todos los campos son requeridos")
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.value = WorkerUiState.Loading
+            try {
+                val worker = Worker(
+                    id = null,
+                    nombre = form.nombre,
+                    apellido = form.apellido,
+                    puesto = form.puesto,
+                    area = form.area,
+                    email = form.email,
+                    telefono = form.telefono
+                )
+                val createdWorker = workerRepository.createWorker(worker)
+                _uiState.value = WorkerUiState.Success("Empleado creado exitosamente")
+                clearForm()
+            } catch (e: Exception) {
+                _uiState.value = WorkerUiState.Error(e.message ?: "Error al crear empleado")
             }
         }
     }
 
     fun updateWorker(id: Long) {
-        val f = _form.value
-        if (!f.isValid) {
-            _uiState.value = WorkerUiState.Error("Completa todos los campos")
+        val form = _formState.value
+        if (form.nombre.isBlank() || form.apellido.isBlank() || form.puesto.isBlank() || form.area.isBlank() || form.email.isBlank() || form.telefono.isBlank()) {
+            _uiState.value = WorkerUiState.Error("Todos los campos son requeridos")
             return
         }
+
         viewModelScope.launch {
             _uiState.value = WorkerUiState.Loading
             try {
-                repo.updateWorker(
-                    id,
-                    pe.edu.upc.logisticmaster.domain.model.Worker(
-                        id       = id,
-                        nombre   = f.nombre,
-                        apellido = f.apellido,
-                        email    = f.email,
-                        telefono = f.telefono,
-                        puesto   = f.puesto,
-                        area     = f.area
-                    )
+                val worker = Worker(
+                    id = id,
+                    nombre = form.nombre,
+                    apellido = form.apellido,
+                    puesto = form.puesto,
+                    area = form.area,
+                    email = form.email,
+                    telefono = form.telefono
                 )
-                _uiState.value = WorkerUiState.Success("Empleado actualizado")
-                loadWorkers()
+                val updatedWorker = workerRepository.updateWorker(worker)
+                _uiState.value = WorkerUiState.Success("Empleado actualizado exitosamente")
+                clearForm()
             } catch (e: Exception) {
-                _uiState.value = WorkerUiState.Error(e.message.orEmpty())
+                _uiState.value = WorkerUiState.Error(e.message ?: "Error al actualizar empleado")
             }
         }
     }
@@ -97,12 +112,49 @@ class WorkerViewModel(
         viewModelScope.launch {
             _uiState.value = WorkerUiState.Loading
             try {
-                repo.deleteWorker(id)
-                _uiState.value = WorkerUiState.Success("Empleado eliminado")
+                workerRepository.deleteWorker(id)
+                _uiState.value = WorkerUiState.Success("Empleado eliminado exitosamente")
                 loadWorkers()
             } catch (e: Exception) {
-                _uiState.value = WorkerUiState.Error(e.message.orEmpty())
+                _uiState.value = WorkerUiState.Error(e.message ?: "Error al eliminar empleado")
             }
         }
     }
+
+    fun updateForm(update: (WorkerFormState) -> WorkerFormState) {
+        _formState.value = update(_formState.value)
+    }
+
+    fun updateNombre(nombre: String) {
+        _formState.value = _formState.value.copy(nombre = nombre)
+    }
+
+    fun updateApellido(apellido: String) {
+        _formState.value = _formState.value.copy(apellido = apellido)
+    }
+
+    fun updatePuesto(puesto: String) {
+        _formState.value = _formState.value.copy(puesto = puesto)
+    }
+
+    fun updateArea(area: String) {
+        _formState.value = _formState.value.copy(area = area)
+    }
+
+    fun updateEmail(email: String) {
+        _formState.value = _formState.value.copy(email = email)
+    }
+
+    fun updateTelefono(telefono: String) {
+        _formState.value = _formState.value.copy(telefono = telefono)
+    }
+
+    private fun clearForm() {
+        _formState.value = WorkerFormState()
+    }
+
+    fun clearError() {
+        _uiState.value = WorkerUiState.Idle
+    }
 }
+

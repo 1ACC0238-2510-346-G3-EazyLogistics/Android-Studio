@@ -1,7 +1,6 @@
 package pe.edu.upc.logisticmaster.presentation.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,24 +19,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import pe.edu.upc.logisticmaster.domain.model.Worker
+import pe.edu.upc.logisticmaster.domain.model.Task
 import pe.edu.upc.logisticmaster.presentation.navigation.Routes
+import pe.edu.upc.logisticmaster.presentation.viewmodel.task.TaskViewModel
+import pe.edu.upc.logisticmaster.presentation.viewmodel.task.TaskUiState
+import pe.edu.upc.logisticmaster.presentation.view.MenuButton
 import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerViewModel
 import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerUiState
-import pe.edu.upc.logisticmaster.presentation.view.MenuButton
 
 @Composable
-fun PersonalManagementScreen(
+fun TaskManagementScreen(
     navController: NavController,
+    taskViewModel: TaskViewModel,
     workerViewModel: WorkerViewModel
 ) {
     val backgroundColor = Color(0xFF10BEAE)
     val cardColor = Color(0xFFFFFFFF)
     val textColor = Color(0xFF000000)
 
+    val taskUiState by taskViewModel.uiState.collectAsState()
     val workerUiState by workerViewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
+        taskViewModel.loadAllTasks()
         workerViewModel.loadWorkers()
     }
 
@@ -51,7 +55,7 @@ fun PersonalManagementScreen(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Gestión de\nPersonal",
+                text = "Gestión de\ntareas",
                 textAlign = TextAlign.Center,
                 color = textColor,
                 fontSize = 28.sp,
@@ -69,13 +73,13 @@ fun PersonalManagementScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 ActionButton(
-                    text = "AGREGAR",
-                    onClick = { navController.navigate(Routes.AddEmployee.route) },
+                    text = "CREAR TAREA",
+                    onClick = { navController.navigate(Routes.CreateTask.route) },
                     modifier = Modifier.weight(1f)
                 )
                 ActionButton(
-                    text = "MODIFICAR",
-                    onClick = { /* Navigate to edit employee screen */ },
+                    text = "ASIGNAR",
+                    onClick = { /* Navigate to assign task screen */ },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -83,27 +87,27 @@ fun PersonalManagementScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Error/Success message
-            when (workerUiState) {
-                is WorkerUiState.Error -> {
+            when (taskUiState) {
+                is TaskUiState.Error -> {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = (workerUiState as WorkerUiState.Error).message,
+                            text = (taskUiState as TaskUiState.Error).message,
                             color = Color.Red,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-                is WorkerUiState.Success -> {
+                is TaskUiState.Success -> {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color.Green.copy(alpha = 0.1f)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = (workerUiState as WorkerUiState.Success).message,
+                            text = (taskUiState as TaskUiState.Success).message,
                             color = Color.Green,
                             modifier = Modifier.padding(16.dp)
                         )
@@ -114,13 +118,13 @@ fun PersonalManagementScreen(
             }
 
             // Loading indicator
-            if (workerUiState is WorkerUiState.Loading) {
+            if (taskUiState is TaskUiState.Loading) {
                 CircularProgressIndicator(
                     color = Color.White,
                     modifier = Modifier.padding(16.dp)
                 )
             } else {
-                // Worker List
+                // Task List
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -133,18 +137,18 @@ fun PersonalManagementScreen(
                             .padding(12.dp)
                     ) {
                         Text(
-                            "Lista de Empleados:",
+                            "Lista de Tareas:",
                             fontWeight = FontWeight.Bold,
                             color = textColor,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
-                        when (workerUiState) {
-                            is WorkerUiState.Loaded -> {
-                                val workers = (workerUiState as WorkerUiState.Loaded).list
-                                if (workers.isEmpty()) {
+                        when (taskUiState) {
+                            is TaskUiState.Loaded -> {
+                                val tasks = (taskUiState as TaskUiState.Loaded).list
+                                if (tasks.isEmpty()) {
                                     Text(
-                                        "No hay empleados disponibles",
+                                        "No hay tareas disponibles",
                                         color = textColor.copy(alpha = 0.6f),
                                         modifier = Modifier.padding(16.dp)
                                     )
@@ -152,11 +156,15 @@ fun PersonalManagementScreen(
                                     LazyColumn(
                                         modifier = Modifier.heightIn(max = 400.dp)
                                     ) {
-                                        items(workers) { worker ->
-                                            WorkerItem(
-                                                worker = worker,
+                                        items(tasks) { task ->
+                                            TaskItem(
+                                                task = task,
+                                                workers = when (workerUiState) {
+                                                    is WorkerUiState.Loaded -> (workerUiState as WorkerUiState.Loaded).list
+                                                    else -> emptyList()
+                                                },
                                                 onEdit = {
-                                                    navController.navigate(Routes.ModificarEmpleado.route)
+                                                    navController.navigate("${Routes.EditTask.route}/${task.id}")
                                                 }
                                             )
                                         }
@@ -165,7 +173,7 @@ fun PersonalManagementScreen(
                             }
                             else -> {
                                 Text(
-                                    "No hay empleados disponibles",
+                                    "No hay tareas disponibles",
                                     color = textColor.copy(alpha = 0.6f),
                                     modifier = Modifier.padding(16.dp)
                                 )
@@ -179,7 +187,7 @@ fun PersonalManagementScreen(
 
             MenuButton("Volver") {
                 navController.navigate(Routes.Menu.route) {
-                    popUpTo(Routes.PersonalManagement.route) { inclusive = true }
+                    popUpTo(Routes.TaskManagement.route) { inclusive = true }
                 }
             }
         }
@@ -199,10 +207,13 @@ fun PersonalManagementScreen(
 }
 
 @Composable
-fun WorkerItem(
-    worker: Worker,
+fun TaskItem(
+    task: Task,
+    workers: List<pe.edu.upc.logisticmaster.domain.model.Worker>,
     onEdit: () -> Unit
 ) {
+    val assignedWorker = workers.find { it.id == task.workerId }
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,22 +230,17 @@ fun WorkerItem(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "${worker.nombre} ${worker.apellido}",
+                    text = task.titulo,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Puesto: ${worker.puesto}",
+                    text = task.descripcion,
                     color = Color.White.copy(alpha = 0.8f),
                     fontSize = 12.sp
                 )
                 Text(
-                    text = "Área: ${worker.area}",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 12.sp
-                )
-                Text(
-                    text = "Email: ${worker.email}",
+                    text = "Asignado a: ${assignedWorker?.nombre ?: "Sin asignar"}",
                     color = Color.White.copy(alpha = 0.7f),
                     fontSize = 10.sp
                 )
@@ -248,4 +254,4 @@ fun WorkerItem(
             }
         }
     }
-}
+} 

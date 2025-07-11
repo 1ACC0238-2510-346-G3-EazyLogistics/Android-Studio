@@ -7,5 +7,5 @@ data class TaskDto(
     val id: Long?,
     val titulo: String,
     val descripcion: String,
-    val workerId: Long
+    val workerId: Long?
 )

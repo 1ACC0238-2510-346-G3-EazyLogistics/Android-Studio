@@ -1,6 +1,5 @@
 package pe.edu.upc.logisticmaster.presentation.navigation
 
-import AddEmployeeScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -11,7 +10,6 @@ import pe.edu.upc.logisticmaster.presentation.viewmodel.worker.WorkerViewModel
 import pe.edu.upc.logisticmaster.presentation.viewmodel.task.TaskViewModel
 import pe.edu.upc.logisticmaster.presentation.viewmodel.reserve.ReserveViewModel
 
-
 @Composable
 fun AppNav(
     navController: NavHostController,
@@ -21,42 +19,50 @@ fun AppNav(
     reserveViewModel: ReserveViewModel
 ) {
     NavHost(navController, startDestination = Routes.Login.route) {
+        
+        // Authentication
         composable(Routes.Login.route) {
-            LoginView(navController, authViewModel)
+            LoginScreen(navController, authViewModel)
         }
         composable(Routes.Register.route) {
-            RegisterView(navController, authViewModel)
+            RegisterUserView(navController, authViewModel)
         }
+
+        // Main Dashboard
         composable(Routes.Menu.route) {
             MainMenuScreen(navController, authViewModel)
         }
+
+        // Worker Management
         composable(Routes.PersonalManagement.route) {
-            PersonalManagementScreen(
-                navController    = navController,
-                workerViewModel  = workerViewModel,
-                authViewModel    = authViewModel
-            )
+            PersonalManagementScreen(navController, workerViewModel)
         }
         composable(Routes.AddEmployee.route) {
-            AddEmployeeScreen(
-                navController,
-                workerViewModel
-            )
+            AddEmplyeeScreen(navController, workerViewModel)
         }
         composable(Routes.ModificarEmpleado.route) {
             ModificarEmpleadoScreen(navController, workerViewModel)
         }
+
+        // Task Management
+        composable(Routes.TaskManagement.route) {
+            TaskManagementScreen(navController, taskViewModel, workerViewModel)
+        }
+        composable(Routes.CreateTask.route) {
+            CreateTaskScreen(navController, taskViewModel, workerViewModel)
+        }
+        composable("${Routes.EditTask.route}/{taskId}") { backStackEntry ->
+            val taskId = backStackEntry.arguments?.getString("taskId")?.toLongOrNull() ?: 0L
+            EditTaskScreen(navController, taskId, taskViewModel, workerViewModel)
+        }
+
+        // Reservation Management
         composable(Routes.ReservationManagement.route) {
             GestionReservasScreen(navController, reserveViewModel)
         }
-        composable(Routes.ReservationDetail.route) {
-            DetalleReservaScreen(navController, reserveViewModel)
-        }
-        composable(Routes.Filters.route) {
-            FilterScreen(navController)
-        }
-        composable(Routes.Reports.route) {
-            ReportScreen(navController)
+        composable("${Routes.ReservationDetail.route}/{reserveId}") { backStackEntry ->
+            val reserveId = backStackEntry.arguments?.getString("reserveId")?.toLongOrNull() ?: 0L
+            DetalleReservaScreen(navController, reserveId, reserveViewModel)
         }
     }
 }
