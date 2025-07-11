@@ -32,6 +32,9 @@ fun AppNav(
         composable(Routes.Menu.route) {
             MainMenuScreen(navController, authViewModel)
         }
+        composable(Routes.Profile.route) {
+            UserProfileScreen(navController, authViewModel)
+        }
 
         // Worker Management
         composable(Routes.PersonalManagement.route) {
@@ -40,8 +43,9 @@ fun AppNav(
         composable(Routes.AddEmployee.route) {
             AddEmplyeeScreen(navController, workerViewModel)
         }
-        composable(Routes.ModificarEmpleado.route) {
-            ModificarEmpleadoScreen(navController, workerViewModel)
+        composable(Routes.ModificarEmpleado.route) { backStackEntry ->
+            val workerId = backStackEntry.arguments?.getString("workerId")?.toLongOrNull() ?: 0L
+            ModificarEmpleadoScreen(navController, workerId, workerViewModel)
         }
 
         // Task Management

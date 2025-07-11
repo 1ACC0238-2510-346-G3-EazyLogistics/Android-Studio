@@ -43,7 +43,17 @@ fun EditTaskScreen(
 
     LaunchedEffect(Unit) {
         workerViewModel.loadWorkers()
-        // TODO: Load task by ID and populate form
+        // Load task by ID and populate form
+        if (taskId > 0) {
+            taskViewModel.loadTaskById(taskId)
+        }
+    }
+
+    // Navigate back on success
+    LaunchedEffect(taskUiState) {
+        if (taskUiState is TaskUiState.Success) {
+            navController.popBackStack()
+        }
     }
 
     Column(
@@ -129,6 +139,24 @@ fun EditTaskScreen(
                     when (workerUiState) {
                         is WorkerUiState.Loaded -> {
                             val workers = (workerUiState as WorkerUiState.Loaded).list
+                            
+                            // No assignment option
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = formState.workerId == null,
+                                    onClick = { taskViewModel.updateWorkerId(null) }
+                                )
+                                Text(
+                                    text = "Sin asignar",
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
+                            }
+                            
                             if (workers.isNotEmpty()) {
                                 workers.forEach { worker ->
                                     Row(
@@ -187,7 +215,6 @@ fun EditTaskScreen(
                     text = "ACTUALIZAR",
                     onClick = { 
                         taskViewModel.updateTask(taskId)
-                        navController.popBackStack()
                     },
                     modifier = Modifier.weight(1f)
                 )

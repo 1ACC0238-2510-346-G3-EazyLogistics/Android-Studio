@@ -44,6 +44,13 @@ fun CreateTaskScreen(
         workerViewModel.loadWorkers()
     }
 
+    // Navigate back on success
+    LaunchedEffect(taskUiState) {
+        if (taskUiState is TaskUiState.Success) {
+            navController.popBackStack()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -127,6 +134,24 @@ fun CreateTaskScreen(
                     when (workerUiState) {
                         is WorkerUiState.Loaded -> {
                             val workers = (workerUiState as WorkerUiState.Loaded).list
+                            
+                            // No assignment option
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = formState.workerId == null,
+                                    onClick = { taskViewModel.updateWorkerId(null) }
+                                )
+                                Text(
+                                    text = "Sin asignar",
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
+                            }
+                            
                             if (workers.isNotEmpty()) {
                                 workers.forEach { worker ->
                                     Row(
@@ -185,7 +210,6 @@ fun CreateTaskScreen(
                     text = "CREAR",
                     onClick = { 
                         taskViewModel.createTask()
-                        navController.popBackStack()
                     },
                     modifier = Modifier.weight(1f)
                 )

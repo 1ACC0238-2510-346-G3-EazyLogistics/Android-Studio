@@ -156,7 +156,7 @@ fun PersonalManagementScreen(
                                             WorkerItem(
                                                 worker = worker,
                                                 onEdit = {
-                                                    navController.navigate(Routes.ModificarEmpleado.route)
+                                                    navController.navigate("${Routes.ModificarEmpleado.route.replace("{workerId}", worker.id.toString())}")
                                                 }
                                             )
                                         }

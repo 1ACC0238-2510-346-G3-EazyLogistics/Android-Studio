@@ -27,6 +27,7 @@ import pe.edu.upc.logisticmaster.presentation.view.ActionButton
 @Composable
 fun ModificarEmpleadoScreen(
     navController: NavController,
+    workerId: Long,
     workerViewModel: WorkerViewModel
 ) {
     val backgroundColor = Color(0xFF10BEAE)
@@ -34,6 +35,20 @@ fun ModificarEmpleadoScreen(
 
     val workerUiState by workerViewModel.uiState.collectAsState()
     val formState by workerViewModel.formState.collectAsState()
+
+    // Load worker data when screen is created
+    LaunchedEffect(workerId) {
+        if (workerId > 0) {
+            workerViewModel.loadWorkerById(workerId)
+        }
+    }
+
+    // Navigate back on success
+    LaunchedEffect(workerUiState) {
+        if (workerUiState is WorkerUiState.Success) {
+            navController.popBackStack()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -160,8 +175,7 @@ fun ModificarEmpleadoScreen(
                 ActionButton(
                     text = "ACTUALIZAR",
                     onClick = { 
-                        // TODO: Implement update worker functionality
-                        navController.popBackStack()
+                        workerViewModel.updateWorker(workerId)
                     },
                     modifier = Modifier.weight(1f)
                 )

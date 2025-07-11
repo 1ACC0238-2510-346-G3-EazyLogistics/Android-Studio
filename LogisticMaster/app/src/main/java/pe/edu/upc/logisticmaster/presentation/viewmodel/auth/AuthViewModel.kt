@@ -67,6 +67,32 @@ class AuthViewModel(
         _authState.value = AuthUiState.Idle
     }
 
+    fun updateProfile(id: Long, username: String, nombre: String, apellido: String, email: String, newPassword: String?) {
+        if (username.isBlank() || nombre.isBlank() || apellido.isBlank() || email.isBlank()) {
+            _authState.value = AuthUiState.Error("Todos los campos son requeridos")
+            return
+        }
+
+        viewModelScope.launch {
+            _authState.value = AuthUiState.Loading
+            try {
+                val user = User(
+                    id = id,
+                    usuario = username,
+                    email = email,
+                    nombre = nombre,
+                    apellido = apellido,
+                    password = newPassword
+                )
+                val updatedUser = userRepository.updateUser(id, user)
+                _currentUser.value = updatedUser
+                _authState.value = AuthUiState.Success("Perfil actualizado exitosamente")
+            } catch (e: Exception) {
+                _authState.value = AuthUiState.Error(e.message ?: "Error al actualizar perfil")
+            }
+        }
+    }
+
     fun clearError() {
         _authState.value = AuthUiState.Idle
     }
