@@ -82,7 +82,6 @@ fun PersonalManagementScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Error/Success message
             when (workerUiState) {
                 is WorkerUiState.Error -> {
                     Card(
