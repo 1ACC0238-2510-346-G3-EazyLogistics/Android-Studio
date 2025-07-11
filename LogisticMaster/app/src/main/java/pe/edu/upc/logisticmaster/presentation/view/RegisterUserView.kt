@@ -200,7 +200,6 @@ fun RegisterUserView(
                         }
                     }
                 )
-
                 ActionButton(
                     text = "VOLVER",
                     onClick = { navController.popBackStack() }
@@ -208,16 +207,5 @@ fun RegisterUserView(
             }
         }
 
-        // Logo pie de página
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Default.TempleHindu,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(48.dp)
-            )
-            Text("LogisticsMasters", color = Color.White, fontWeight = FontWeight.Bold)
-            Text("Potenciando la experiencia hotelera", color = Color.White, fontSize = 12.sp)
         }
     }
-}

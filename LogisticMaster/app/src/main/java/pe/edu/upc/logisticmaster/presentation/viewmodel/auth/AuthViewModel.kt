@@ -23,7 +23,6 @@ class AuthViewModel(
             _authState.value = AuthUiState.Error("Todos los campos son requeridos")
             return
         }
-
         viewModelScope.launch {
             _authState.value = AuthUiState.Loading
             try {

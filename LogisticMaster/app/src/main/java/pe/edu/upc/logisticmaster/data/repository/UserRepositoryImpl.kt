@@ -32,7 +32,7 @@ class UserRepositoryImpl(
         email = this.email,
         nombre = this.nombre,
         apellido = this.apellido,
-        password = this.password
+        contraseña = this.password
     )
 
     private fun UserDto.toDomain() = User(
@@ -41,6 +41,6 @@ class UserRepositoryImpl(
         email = this.email,
         nombre = this.nombre,
         apellido = this.apellido,
-        password = this.password
+        password = this.contraseña,
     )
 } 
